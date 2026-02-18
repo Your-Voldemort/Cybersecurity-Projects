@@ -18,7 +18,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY backend/pyproject.toml ./
-RUN uv pip install --target /app/deps .
+RUN uv pip compile pyproject.toml -o requirements.txt && \
+    uv pip install --target /app/deps -r requirements.txt
 
 FROM python:3.14-slim
 

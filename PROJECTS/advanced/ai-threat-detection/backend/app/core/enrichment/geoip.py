@@ -20,6 +20,7 @@ class GeoResult:
     """
     Structured GeoIP lookup result.
     """
+
     country: str | None
     city: str | None
     lat: float | None

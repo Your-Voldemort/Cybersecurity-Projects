@@ -72,9 +72,7 @@ def _parse_split(line: str) -> ParsedLogEntry | None:
         bracket_open = prefix.index("[")
         bracket_close = prefix.index("]")
         ip = prefix[:bracket_open].split()[0]
-        timestamp = datetime.strptime(
-            prefix[bracket_open + 1 : bracket_close], _TIMESTAMP_FMT
-        )
+        timestamp = datetime.strptime(prefix[bracket_open + 1 : bracket_close], _TIMESTAMP_FMT)
 
         request_parts = request_line.split(" ", 2)
         method = request_parts[0]

@@ -6,6 +6,7 @@ tailer.py
 import asyncio
 import logging
 import os
+from io import TextIOWrapper
 from pathlib import Path
 
 from watchdog.events import (
@@ -28,14 +29,14 @@ class _LogHandler(FileSystemEventHandler):
     def __init__(
         self,
         target: str,
-        queue: asyncio.Queue[str],
+        queue: asyncio.Queue[str | None],
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         super().__init__()
         self._target = target
         self._queue = queue
         self._loop = loop
-        self._file = None
+        self._file: TextIOWrapper | None = None
         self._inode: int | None = None
         self._open_target()
 
@@ -44,7 +45,7 @@ class _LogHandler(FileSystemEventHandler):
         Open the target log file and seek to the end.
         """
         try:
-            self._file = open(self._target, encoding="utf-8", errors="replace")
+            self._file = open(self._target, encoding="utf-8", errors="replace")  # noqa: SIM115
             self._file.seek(0, os.SEEK_END)
             self._inode = os.stat(self._target).st_ino
             logger.info("Tailing %s (inode %s)", self._target, self._inode)
@@ -75,7 +76,7 @@ class _LogHandler(FileSystemEventHandler):
             self._file.close()
 
         try:
-            self._file = open(self._target, encoding="utf-8", errors="replace")
+            self._file = open(self._target, encoding="utf-8", errors="replace")  # noqa: SIM115
             self._inode = os.stat(self._target).st_ino
             logger.info("Rotated to new %s (inode %s)", self._target, self._inode)
         except FileNotFoundError:
@@ -92,14 +93,14 @@ class _LogHandler(FileSystemEventHandler):
         except FileNotFoundError:
             return False
 
-    def on_modified(self, event: FileModifiedEvent) -> None:
+    def on_modified(self, event: FileModifiedEvent) -> None:  # type: ignore[override]
         """
         Handle new data appended to the log file.
         """
         if not isinstance(event, FileModifiedEvent) or event.is_directory:
             return
 
-        if Path(event.src_path).resolve() != Path(self._target).resolve():
+        if Path(str(event.src_path)).resolve() != Path(self._target).resolve():
             return
 
         if self._inode_changed():
@@ -108,25 +109,25 @@ class _LogHandler(FileSystemEventHandler):
 
         self._read_new_lines()
 
-    def on_moved(self, event: FileMovedEvent) -> None:
+    def on_moved(self, event: FileMovedEvent) -> None:  # type: ignore[override]
         """
         Handle log rotation via rename (access.log -> access.log.1).
         """
         if not isinstance(event, FileMovedEvent):
             return
 
-        if Path(event.src_path).resolve() == Path(self._target).resolve():
+        if Path(str(event.src_path)).resolve() == Path(self._target).resolve():
             logger.info("Log rotated: %s -> %s", event.src_path, event.dest_path)
             self._handle_rotation()
 
-    def on_created(self, event: FileCreatedEvent) -> None:
+    def on_created(self, event: FileCreatedEvent) -> None:  # type: ignore[override]
         """
         Handle log rotation where a new file is created at the target path.
         """
         if not isinstance(event, FileCreatedEvent) or event.is_directory:
             return
 
-        if Path(event.src_path).resolve() == Path(self._target).resolve():
+        if Path(str(event.src_path)).resolve() == Path(self._target).resolve():
             logger.info("New log file created: %s", event.src_path)
             self._handle_rotation()
 
@@ -148,7 +149,7 @@ class LogTailer:
     def __init__(
         self,
         log_path: str,
-        queue: asyncio.Queue[str],
+        queue: asyncio.Queue[str | None],
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._log_path = log_path

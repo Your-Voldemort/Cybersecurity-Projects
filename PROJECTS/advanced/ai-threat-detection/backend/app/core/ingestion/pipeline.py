@@ -26,6 +26,7 @@ class EnrichedRequest:
     """
     A parsed log entry enriched with extracted features and GeoIP data.
     """
+
     entry: ParsedLogEntry
     features: dict[str, int | float | bool | str]
     feature_vector: list[float]
@@ -37,6 +38,7 @@ class ScoredRequest:
     """
     A fully scored request ready for dispatch.
     """
+
     entry: ParsedLogEntry
     features: dict[str, int | float | bool | str]
     feature_vector: list[float]
@@ -56,7 +58,7 @@ class Pipeline:
 
     def __init__(
         self,
-        redis_client: aioredis.Redis,
+        redis_client: aioredis.Redis[bytes],
         rule_engine: RuleEngine,
         geoip: GeoIPService | None = None,
         on_result: Callable[[ScoredRequest], Awaitable[None]] | None = None,
@@ -82,7 +84,7 @@ class Pipeline:
         self._rule_engine = rule_engine
         self._geoip = geoip
         self._on_result = on_result
-        self._tasks: list[asyncio.Task] = []
+        self._tasks: list[asyncio.Task[None]] = []
 
     async def start(self) -> None:
         """
@@ -147,7 +149,7 @@ class Pipeline:
                     ip=entry.ip,
                     request_id=uuid.uuid4().hex,
                     path=entry.path,
-                    path_depth=per_request["path_depth"],
+                    path_depth=int(per_request["path_depth"]),
                     method=entry.method,
                     status_code=entry.status_code,
                     user_agent=entry.user_agent,
@@ -182,7 +184,8 @@ class Pipeline:
                 break
             try:
                 rule_result = self._rule_engine.score_request(
-                    enriched.features, enriched.entry,
+                    enriched.features,
+                    enriched.entry,
                 )
                 await self._alert_queue.put(
                     ScoredRequest(

@@ -3,6 +3,7 @@
 rules.py
 """
 
+import re
 from dataclasses import dataclass, field
 from typing import NamedTuple
 
@@ -20,17 +21,19 @@ from app.core.ingestion.parsers import ParsedLogEntry
 
 class _PatternRule(NamedTuple):
     """
-    A regex-based detection rule applied to the request URI.
+    A regex based detection rule applied to the request URI
     """
+
     name: str
-    pattern: object
+    pattern: re.Pattern[str]
     score: float
 
 
 class _ThresholdRule(NamedTuple):
     """
-    A threshold-based detection rule applied to a windowed feature.
+    A threshold-based detection rule applied to a windowed feature
     """
+
     name: str
     feature_key: str
     threshold: float
@@ -60,6 +63,7 @@ class RuleResult:
     """
     Output of the rule-based detection engine for a single request.
     """
+
     threat_score: float
     severity: str
     matched_rules: list[str] = field(default_factory=list)
@@ -81,7 +85,7 @@ class RuleEngine:
     """
     Cold-start rule-based detection engine inspired by ModSecurity CRS.
     Scores requests using pattern matching, signature detection,
-    and behavioral thresholds from windowed features.
+    and behavioral thresholds from windowed features
     """
 
     def score_request(
@@ -109,10 +113,10 @@ class RuleEngine:
         if any(sig in ua_lower for sig in SCANNER_USER_AGENTS):
             matched.append(("SCANNER_UA", _SCANNER_UA_SCORE))
 
-        for rule in _THRESHOLD_RULES:
-            value = features.get(rule.feature_key, 0)
-            if isinstance(value, (int, float)) and value > rule.threshold:
-                matched.append((rule.name, rule.score))
+        for trule in _THRESHOLD_RULES:
+            value = features.get(trule.feature_key, 0)
+            if isinstance(value, (int, float)) and value > trule.threshold:
+                matched.append((trule.name, trule.score))
 
         if not matched:
             return RuleResult(threat_score=0.0, severity="LOW")
@@ -127,5 +131,5 @@ class RuleEngine:
             threat_score=threat_score,
             severity=_classify_severity(threat_score),
             matched_rules=[name for name, _ in matched],
-            component_scores={name: score for name, score in matched},
+            component_scores=dict(matched),
         )

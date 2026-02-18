@@ -27,7 +27,7 @@ class WindowAggregator:
     Per-IP sliding window feature aggregator backed by Redis sorted sets.
     """
 
-    def __init__(self, redis_client: aioredis.Redis) -> None:
+    def __init__(self, redis_client: aioredis.Redis[bytes]) -> None:
         self._redis = redis_client
 
     async def record_and_aggregate(
@@ -66,17 +66,11 @@ class WindowAggregator:
 
         pipe.zadd(keys["requests"], {request_id: timestamp})
         pipe.zadd(keys["paths"], {_hash_member(path): timestamp})
-        pipe.zadd(
-            keys["statuses"], {f"{status_code}:{request_id}": timestamp}
-        )
+        pipe.zadd(keys["statuses"], {f"{status_code}:{request_id}": timestamp})
         pipe.zadd(keys["uas"], {_hash_member(user_agent): timestamp})
-        pipe.zadd(
-            keys["sizes"], {f"{response_size}:{request_id}": timestamp}
-        )
+        pipe.zadd(keys["sizes"], {f"{response_size}:{request_id}": timestamp})
         pipe.zadd(keys["methods"], {f"{method}:{request_id}": timestamp})
-        pipe.zadd(
-            keys["depths"], {f"{path_depth}:{request_id}": timestamp}
-        )
+        pipe.zadd(keys["depths"], {f"{path_depth}:{request_id}": timestamp})
 
         for key in keys.values():
             pipe.zremrangebyscore(key, "-inf", trim_boundary)
@@ -90,9 +84,7 @@ class WindowAggregator:
         pipe.zrangebyscore(keys["sizes"], w5m, "+inf")
         pipe.zrangebyscore(keys["methods"], w5m, "+inf")
         pipe.zrangebyscore(keys["depths"], w5m, "+inf")
-        pipe.zrangebyscore(
-            keys["requests"], w10m, "+inf", withscores=True
-        )
+        pipe.zrangebyscore(keys["requests"], w10m, "+inf", withscores=True)
 
         for key in keys.values():
             pipe.expire(key, KEY_TTL)
@@ -135,9 +127,7 @@ def _error_rate(status_members: list[str]) -> float:
     """
     if not status_members:
         return 0.0
-    errors = sum(
-        1 for m in status_members if int(m.split(":")[0]) >= 400
-    )
+    errors = sum(1 for m in status_members if int(m.split(":")[0]) >= 400)
     return errors / len(status_members)
 
 
@@ -160,9 +150,7 @@ def _method_entropy(method_members: list[str]) -> float:
     methods = [m.split(":")[0] for m in method_members]
     counts = Counter(methods)
     total = len(methods)
-    return -sum(
-        (c / total) * math.log2(c / total) for c in counts.values()
-    )
+    return -sum((c / total) * math.log2(c / total) for c in counts.values())
 
 
 def _status_diversity(status_members: list[str]) -> float:
@@ -195,10 +183,7 @@ def _inter_request_time_stats(
     if len(entries) < 2:
         return 0.0, 0.0
     timestamps = sorted(score for _, score in entries)
-    deltas = [
-        (timestamps[i + 1] - timestamps[i]) * 1000
-        for i in range(len(timestamps) - 1)
-    ]
+    deltas = [(timestamps[i + 1] - timestamps[i]) * 1000 for i in range(len(timestamps) - 1)]
     mean = sum(deltas) / len(deltas)
     if len(deltas) < 2:
         return mean, 0.0

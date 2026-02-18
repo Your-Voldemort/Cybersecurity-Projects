@@ -66,6 +66,7 @@ docker-compose.override.yml
 data/models/
 data/geoip/
 data/sample-logs/*.log
+!data/sample-logs/sample-access.log
 
 # MLflow
 mlruns/

@@ -3,7 +3,6 @@
 test_geoip.py
 """
 
-import asyncio
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -109,9 +108,7 @@ async def test_lookup_missing_city_name(mock_reader) -> None:
     """
     Responses with None city name are handled gracefully.
     """
-    mock_reader.city.return_value = _mock_city_response(
-        city_name=None, lat=0.0, lon=0.0
-    )
+    mock_reader.city.return_value = _mock_city_response(city_name=None, lat=0.0, lon=0.0)
     service = GeoIPService.__new__(GeoIPService)
     service._reader = mock_reader
 

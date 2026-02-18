@@ -16,7 +16,7 @@ class TimestampedModel(SQLModel):
     """
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    created_at: datetime = Field(
+    created_at: datetime = Field(  # type: ignore[call-overload]
         sa_type=DateTime(timezone=True),
         sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")},
         nullable=False,

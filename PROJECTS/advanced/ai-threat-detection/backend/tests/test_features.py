@@ -3,7 +3,7 @@
 test_features.py
 """
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 from app.core.features.extractor import extract_request_features
 from app.core.ingestion.parsers import ParsedLogEntry
@@ -50,7 +50,7 @@ def _make_entry(
     Build a ParsedLogEntry with sensible defaults for testing.
     """
     if timestamp is None:
-        timestamp = datetime(2026, 2, 11, 14, 30, 0, tzinfo=timezone.utc)
+        timestamp = datetime(2026, 2, 11, 14, 30, 0, tzinfo=UTC)
 
     return ParsedLogEntry(
         ip=ip,
@@ -80,21 +80,15 @@ def test_path_depth() -> None:
     """
     assert extract_request_features(_make_entry(path="/"))["path_depth"] == 0
     assert extract_request_features(_make_entry(path="/api"))["path_depth"] == 1
-    assert extract_request_features(
-        _make_entry(path="/api/v1/users")
-    )["path_depth"] == 3
+    assert extract_request_features(_make_entry(path="/api/v1/users"))["path_depth"] == 3
 
 
 def test_path_entropy_high_vs_low() -> None:
     """
     Random-character paths have higher entropy than simple paths.
     """
-    low = extract_request_features(
-        _make_entry(path="/index.html")
-    )["path_entropy"]
-    high = extract_request_features(
-        _make_entry(path="/x8Kp2mQz7wR4vL1n")
-    )["path_entropy"]
+    low = extract_request_features(_make_entry(path="/index.html"))["path_entropy"]
+    high = extract_request_features(_make_entry(path="/x8Kp2mQz7wR4vL1n"))["path_entropy"]
     assert high > low
 
 
@@ -102,9 +96,7 @@ def test_query_string_features() -> None:
     """
     Query param count and length are extracted correctly.
     """
-    features = extract_request_features(
-        _make_entry(query_string="page=1&sort=name&limit=50")
-    )
+    features = extract_request_features(_make_entry(query_string="page=1&sort=name&limit=50"))
     assert features["query_param_count"] == 3
     assert features["query_string_length"] == len("page=1&sort=name&limit=50")
 
@@ -122,9 +114,7 @@ def test_url_encoding_detection() -> None:
     )
     assert encoded["has_encoded_chars"] is True
 
-    clean = extract_request_features(
-        _make_entry(path="/index.html", query_string="")
-    )
+    clean = extract_request_features(_make_entry(path="/index.html", query_string=""))
     assert clean["has_encoded_chars"] is False
 
 
@@ -132,14 +122,10 @@ def test_double_encoding_detection() -> None:
     """
     Double-encoded sequences like %2527 are flagged.
     """
-    double = extract_request_features(
-        _make_entry(path="/path%2527trick")
-    )
+    double = extract_request_features(_make_entry(path="/path%2527trick"))
     assert double["has_double_encoding"] is True
 
-    single = extract_request_features(
-        _make_entry(path="/path%27normal")
-    )
+    single = extract_request_features(_make_entry(path="/path%27normal"))
     assert single["has_double_encoding"] is False
 
 
@@ -147,33 +133,23 @@ def test_status_class() -> None:
     """
     Status class groups status codes into Nxx buckets.
     """
-    assert extract_request_features(
-        _make_entry(status_code=200)
-    )["status_class"] == "2xx"
-    assert extract_request_features(
-        _make_entry(status_code=404)
-    )["status_class"] == "4xx"
-    assert extract_request_features(
-        _make_entry(status_code=503)
-    )["status_class"] == "5xx"
+    assert extract_request_features(_make_entry(status_code=200))["status_class"] == "2xx"
+    assert extract_request_features(_make_entry(status_code=404))["status_class"] == "4xx"
+    assert extract_request_features(_make_entry(status_code=503))["status_class"] == "5xx"
 
 
 def test_temporal_features() -> None:
     """
     Hour, day of week, and weekend flag derived from timestamp.
     """
-    wednesday_2pm = datetime(2026, 2, 11, 14, 0, 0, tzinfo=timezone.utc)
-    features = extract_request_features(
-        _make_entry(timestamp=wednesday_2pm)
-    )
+    wednesday_2pm = datetime(2026, 2, 11, 14, 0, 0, tzinfo=UTC)
+    features = extract_request_features(_make_entry(timestamp=wednesday_2pm))
     assert features["hour_of_day"] == 14
     assert features["day_of_week"] == 2
     assert features["is_weekend"] is False
 
-    saturday_3am = datetime(2026, 2, 14, 3, 0, 0, tzinfo=timezone.utc)
-    weekend = extract_request_features(
-        _make_entry(timestamp=saturday_3am)
-    )
+    saturday_3am = datetime(2026, 2, 14, 3, 0, 0, tzinfo=UTC)
+    weekend = extract_request_features(_make_entry(timestamp=saturday_3am))
     assert weekend["hour_of_day"] == 3
     assert weekend["day_of_week"] == 5
     assert weekend["is_weekend"] is True
@@ -200,14 +176,10 @@ def test_ua_scanner_detection() -> None:
     """
     Known vulnerability scanner user agents are flagged.
     """
-    nikto = extract_request_features(
-        _make_entry(user_agent="Mozilla/5.00 (Nikto/2.1.6)")
-    )
+    nikto = extract_request_features(_make_entry(user_agent="Mozilla/5.00 (Nikto/2.1.6)"))
     assert nikto["is_known_scanner"] is True
 
-    sqlmap = extract_request_features(
-        _make_entry(user_agent="sqlmap/1.8")
-    )
+    sqlmap = extract_request_features(_make_entry(user_agent="sqlmap/1.8"))
     assert sqlmap["is_known_scanner"] is True
 
 
@@ -215,9 +187,7 @@ def test_attack_pattern_detection() -> None:
     """
     SQLi, XSS, and path traversal patterns in paths are detected.
     """
-    sqli = extract_request_features(
-        _make_entry(path="/users", query_string="id=1' OR 1=1--")
-    )
+    sqli = extract_request_features(_make_entry(path="/users", query_string="id=1' OR 1=1--"))
     assert sqli["has_attack_pattern"] is True
 
     xss = extract_request_features(
@@ -225,14 +195,10 @@ def test_attack_pattern_detection() -> None:
     )
     assert xss["has_attack_pattern"] is True
 
-    traversal = extract_request_features(
-        _make_entry(path="/static/../../etc/passwd")
-    )
+    traversal = extract_request_features(_make_entry(path="/static/../../etc/passwd"))
     assert traversal["has_attack_pattern"] is True
 
-    clean = extract_request_features(
-        _make_entry(path="/api/v1/health")
-    )
+    clean = extract_request_features(_make_entry(path="/api/v1/health"))
     assert clean["has_attack_pattern"] is False
 
 
@@ -240,13 +206,11 @@ def test_special_char_ratio() -> None:
     """
     Paths with many non-alphanumeric characters have higher ratios.
     """
-    clean = extract_request_features(
-        _make_entry(path="/api/users")
-    )["special_char_ratio"]
+    clean = extract_request_features(_make_entry(path="/api/users"))["special_char_ratio"]
 
-    noisy = extract_request_features(
-        _make_entry(path="/<script>alert('xss')</script>")
-    )["special_char_ratio"]
+    noisy = extract_request_features(_make_entry(path="/<script>alert('xss')</script>"))[
+        "special_char_ratio"
+    ]
 
     assert noisy > clean
 
@@ -255,51 +219,39 @@ def test_private_ip_detection() -> None:
     """
     RFC 1918 and loopback addresses are classified as private.
     """
-    assert extract_request_features(
-        _make_entry(ip="192.168.1.1")
-    )["is_private_ip"] is True
+    assert extract_request_features(_make_entry(ip="192.168.1.1"))["is_private_ip"] is True
 
-    assert extract_request_features(
-        _make_entry(ip="127.0.0.1")
-    )["is_private_ip"] is True
+    assert extract_request_features(_make_entry(ip="127.0.0.1"))["is_private_ip"] is True
 
-    assert extract_request_features(
-        _make_entry(ip="8.8.8.8")
-    )["is_private_ip"] is False
+    assert extract_request_features(_make_entry(ip="8.8.8.8"))["is_private_ip"] is False
 
 
 def test_file_extension() -> None:
     """
     File extension is extracted from the path.
     """
-    assert extract_request_features(
-        _make_entry(path="/style.css")
-    )["file_extension"] == ".css"
+    assert extract_request_features(_make_entry(path="/style.css"))["file_extension"] == ".css"
 
-    assert extract_request_features(
-        _make_entry(path="/api/users")
-    )["file_extension"] == ""
+    assert extract_request_features(_make_entry(path="/api/users"))["file_extension"] == ""
 
 
 def test_country_code_passthrough() -> None:
     """
     Country code is passed through from the caller.
     """
-    features = extract_request_features(
-        _make_entry(), country_code="US"
-    )
+    features = extract_request_features(_make_entry(), country_code="US")
     assert features["country_code"] == "US"
 
     features_empty = extract_request_features(_make_entry())
     assert features_empty["country_code"] == ""
 
 
-import time
+import time  # noqa: E402
 
-import fakeredis.aioredis
-import pytest
+import fakeredis.aioredis  # noqa: E402
+import pytest  # noqa: E402
 
-from app.core.features.aggregator import WindowAggregator
+from app.core.features.aggregator import WindowAggregator  # noqa: E402
 
 AGGREGATOR_KEYS = {
     "req_count_1m",
@@ -476,8 +428,8 @@ async def test_aggregator_window_boundary(aggregator) -> None:
     assert result["req_count_5m"] == 2
 
 
-from app.core.features.encoder import encode_for_inference
-from app.core.features.mappings import FEATURE_ORDER, METHOD_MAP, STATUS_CLASS_MAP
+from app.core.features.encoder import encode_for_inference  # noqa: E402
+from app.core.features.mappings import FEATURE_ORDER, METHOD_MAP, STATUS_CLASS_MAP  # noqa: E402
 
 
 def _full_features() -> dict[str, int | float | bool | str]:

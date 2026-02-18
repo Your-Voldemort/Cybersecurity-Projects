@@ -3,8 +3,6 @@
 test_pipeline.py
 """
 
-import asyncio
-
 import fakeredis.aioredis
 import pytest
 
@@ -12,14 +10,14 @@ from app.core.detection.rules import RuleEngine
 from app.core.ingestion.pipeline import Pipeline, ScoredRequest
 
 VALID_LINE = (
-    '93.184.216.34 - - [11/Feb/2026:14:30:00 +0000] '
+    "93.184.216.34 - - [11/Feb/2026:14:30:00 +0000] "
     '"GET /api/v1/users HTTP/1.1" 200 1234 '
     '"https://example.com" '
     '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"'
 )
 
 SQLI_LINE = (
-    '93.184.216.34 - - [11/Feb/2026:14:30:01 +0000] '
+    "93.184.216.34 - - [11/Feb/2026:14:30:01 +0000] "
     '"GET /users?id=1%27OR%201=1-- HTTP/1.1" 200 512 '
     '"-" "Mozilla/5.0"'
 )

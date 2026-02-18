@@ -1,5 +1,5 @@
 # ©AngelaMos | 2026
-# Development Docker Compose
+# dev.compose.yml
 
 services:
   postgres:
@@ -8,90 +8,74 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-angelusvigil}
       POSTGRES_USER: ${POSTGRES_USER:-vigil}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
-      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
-    volumes:
-      - postgres_dev_data:/var/lib/postgresql/data
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword}
     ports:
       - "${POSTGRES_HOST_PORT:-16969}:5432"
+    volumes:
+      - postgres_dev:/var/lib/postgresql/data
     networks:
-      - vigil_network_dev
+      - vigil_dev
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vigil} -d ${POSTGRES_DB:-angelusvigil}"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 5
+      start_period: 10s
 
   redis:
     image: redis:7.4-alpine
     container_name: vigil-redis-dev
-    command: redis-server /usr/local/etc/redis/redis.conf
-    volumes:
-      - redis_dev_data:/data
-      - ./infra/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server --appendonly yes
     ports:
       - "${REDIS_HOST_PORT:-26969}:6379"
+    volumes:
+      - redis_dev:/data
     networks:
-      - vigil_network_dev
+      - vigil_dev
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 5
+      start_period: 3s
 
   backend:
     build:
       context: .
-      dockerfile: infra/docker/fastapi.dev
+      dockerfile: infra/docker/fastapi.prod
     container_name: vigil-backend-dev
     environment:
-      ENV: ${ENV:-development}
-      DEBUG: ${DEBUG:-true}
-      LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
-      API_KEY: ${API_KEY:-dev-api-key}
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vigil}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-angelusvigil}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      ENV: development
+      DEBUG: "true"
+      LOG_LEVEL: INFO
+      API_KEY: ${API_KEY:-dev-test-key}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vigil}:${POSTGRES_PASSWORD:-devpassword}@postgres:5432/${POSTGRES_DB:-angelusvigil}
+      REDIS_URL: redis://redis:6379
       NGINX_LOG_PATH: /var/log/nginx/access.log
       GEOIP_DB_PATH: /usr/share/GeoIP/GeoLite2-City.mmdb
+    ports:
+      - "${BACKEND_HOST_PORT:-36969}:8000"
     volumes:
-      - ./backend:/app
-      - /app/.venv
-      - /app/__pycache__
-      - ./data/sample-logs:/var/log/nginx:ro
-      - geoip_dev_data:/usr/share/GeoIP:ro
+      - nginx_logs_dev:/var/log/nginx
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
-      - vigil_network_dev
-    ports:
-      - "${BACKEND_HOST_PORT:-36969}:8000"
-    restart: unless-stopped
-
-  geoip-updater:
-    image: maxmindinc/geoipupdate:latest
-    container_name: vigil-geoip-dev
-    environment:
-      GEOIPUPDATE_ACCOUNT_ID: ${GEOIP_ACCOUNT_ID:-0}
-      GEOIPUPDATE_LICENSE_KEY: ${GEOIP_LICENSE_KEY:-placeholder}
-      GEOIPUPDATE_EDITION_IDS: "GeoLite2-City"
-      GEOIPUPDATE_FREQUENCY: "168"
-    volumes:
-      - geoip_dev_data:/usr/share/GeoIP
-    networks:
-      - vigil_network_dev
+      - vigil_dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
 networks:
-  vigil_network_dev:
+  vigil_dev:
     driver: bridge
-    name: vigil_network_dev
 
 volumes:
-  postgres_dev_data:
-    name: vigil_postgres_dev_data
-  redis_dev_data:
-    name: vigil_redis_dev_data
-  geoip_dev_data:
-    name: vigil_geoip_dev_data
+  postgres_dev:
+  redis_dev:
+  nginx_logs_dev:

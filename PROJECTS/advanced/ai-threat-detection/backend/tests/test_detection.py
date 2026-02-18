@@ -3,9 +3,9 @@
 test_detection.py
 """
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
-from app.core.detection.rules import RuleEngine, RuleResult
+from app.core.detection.rules import RuleEngine
 from app.core.ingestion.parsers import ParsedLogEntry
 
 
@@ -21,7 +21,7 @@ def _make_entry(
     """
     return ParsedLogEntry(
         ip="93.184.216.34",
-        timestamp=datetime(2026, 2, 11, 14, 30, 0, tzinfo=timezone.utc),
+        timestamp=datetime(2026, 2, 11, 14, 30, 0, tzinfo=UTC),
         method=method,
         path=path,
         query_string=query_string,

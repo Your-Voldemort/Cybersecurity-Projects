@@ -6,6 +6,7 @@ health.py
 import time
 
 from fastapi import APIRouter, Request, Response
+from sqlalchemy import text
 
 from app.core.redis_manager import redis_manager
 
@@ -13,7 +14,7 @@ router = APIRouter()
 
 
 @router.get("/health")
-async def health(request: Request) -> dict:
+async def health(request: Request) -> dict[str, object]:
     """
     Liveness probe — returns 200 if the process is alive.
     """
@@ -26,7 +27,7 @@ async def health(request: Request) -> dict:
 
 
 @router.get("/ready")
-async def ready(request: Request, response: Response) -> dict:
+async def ready(request: Request, response: Response) -> dict[str, object]:
     """
     Readiness probe — checks all service dependencies.
     """
@@ -66,7 +67,7 @@ async def _check_database(request: Request) -> bool:
         return False
     try:
         async with engine.connect() as conn:
-            await conn.execute("SELECT 1")
+            await conn.execute(text("SELECT 1"))
         return True
     except Exception:
         return False

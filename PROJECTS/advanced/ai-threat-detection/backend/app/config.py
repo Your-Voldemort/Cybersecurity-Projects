@@ -25,9 +25,7 @@ class Settings(BaseSettings):
     api_key: str = ""
     log_level: str = "INFO"
 
-    database_url: str = (
-        "postgresql+asyncpg://vigil:changeme@localhost:5432/angelusvigil"
-    )
+    database_url: str = "postgresql+asyncpg://vigil:changeme@localhost:5432/angelusvigil"
 
     redis_url: str = "redis://localhost:6379"
 

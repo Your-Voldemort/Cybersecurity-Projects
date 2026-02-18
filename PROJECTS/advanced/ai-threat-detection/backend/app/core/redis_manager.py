@@ -14,7 +14,7 @@ class RedisManager:
     """
 
     def __init__(self) -> None:
-        self._client: aioredis.Redis | None = None
+        self._client: aioredis.Redis[str] | None = None
 
     async def connect(self) -> None:
         """
@@ -30,11 +30,11 @@ class RedisManager:
         Close the Redis connection and release resources.
         """
         if self._client:
-            await self._client.aclose()
+            await self._client.aclose()  # type: ignore[attr-defined]
             self._client = None
 
     @property
-    def client(self) -> aioredis.Redis | None:
+    def client(self) -> aioredis.Redis[str] | None:
         """
         Return the active Redis client or None if not connected.
         """

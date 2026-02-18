@@ -25,9 +25,7 @@ def _shannon_entropy(s: str) -> float:
         return 0.0
     length = len(s)
     counts = Counter(s)
-    return -sum(
-        (c / length) * math.log2(c / length) for c in counts.values()
-    )
+    return -sum((c / length) * math.log2(c / length) for c in counts.values())
 
 
 def _is_private_ip(ip_str: str) -> bool:
@@ -63,9 +61,7 @@ def extract_request_features(
         "path_entropy": _shannon_entropy(entry.path),
         "path_length": path_len,
         "query_string_length": len(entry.query_string),
-        "query_param_count": (
-            len(entry.query_string.split("&")) if entry.query_string else 0
-        ),
+        "query_param_count": (len(entry.query_string.split("&")) if entry.query_string else 0),
         "has_encoded_chars": bool(ENCODED_CHARS.search(full_uri)),
         "has_double_encoding": bool(DOUBLE_ENCODED.search(full_uri)),
         "status_code": entry.status_code,
@@ -77,9 +73,7 @@ def extract_request_features(
         "ua_length": len(entry.user_agent),
         "ua_entropy": _shannon_entropy(entry.user_agent),
         "is_known_bot": any(sig in ua_lower for sig in BOT_USER_AGENTS),
-        "is_known_scanner": any(
-            sig in ua_lower for sig in SCANNER_USER_AGENTS
-        ),
+        "is_known_scanner": any(sig in ua_lower for sig in SCANNER_USER_AGENTS),
         "has_attack_pattern": bool(ATTACK_COMBINED.search(full_uri)),
         "special_char_ratio": non_alnum / path_len if path_len else 0.0,
         "file_extension": ext,

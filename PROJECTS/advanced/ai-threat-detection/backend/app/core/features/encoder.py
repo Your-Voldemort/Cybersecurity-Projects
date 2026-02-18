@@ -34,9 +34,9 @@ def encode_for_inference(
         if name in BOOLEAN_FEATURES:
             vector.append(1.0 if raw else 0.0)
         elif name in CATEGORICAL_ENCODERS:
-            vector.append(float(CATEGORICAL_ENCODERS[name].get(raw, 0)))
+            vector.append(float(CATEGORICAL_ENCODERS[name].get(str(raw), 0)))
         elif name == "country_code":
-            vector.append(_encode_country(raw))
+            vector.append(_encode_country(str(raw)))
         else:
             vector.append(float(raw))
 
