@@ -91,7 +91,7 @@ class PngProcessor:
                 if key in ("icc_profile", "exif", "transparency", "gamma"):
                     continue
 
-                if isinstance(value, (str, bytes)):
+                if isinstance(value, str | bytes):
                     found_metadata = True
                     if isinstance(value, bytes):
                         try:

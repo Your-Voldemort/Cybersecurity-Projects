@@ -4,7 +4,6 @@ test_algorithms.py
 """
 from __future__ import annotations
 
-import time
 
 import pytest
 
@@ -17,7 +16,6 @@ from fastapi_420.types import Algorithm
 
 from tests.conftest import (
     WINDOW_MINUTE,
-    WINDOW_SECOND,
     RuleFactory,
 )
 
@@ -75,8 +73,8 @@ class TestSlidingWindowAlgorithm:
         storage = MemoryStorage()
         rule = RuleFactory.per_minute(100)
 
-        for i in range(50):
-            result = await algo.check(storage, f"multi_key", rule)
+        for _i in range(50):
+            result = await algo.check(storage, "multi_key", rule)
             assert result.allowed is True
 
         assert result.remaining == 50

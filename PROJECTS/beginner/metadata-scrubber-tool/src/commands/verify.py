@@ -14,7 +14,6 @@ from rich.console import Console
 from src.services.metadata_factory import MetadataFactory
 from src.services.report_generator import ReportGenerator
 
-
 console = Console()
 log = logging.getLogger("metadata-scrubber")
 

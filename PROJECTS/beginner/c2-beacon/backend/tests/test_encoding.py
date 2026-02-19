@@ -3,7 +3,6 @@ AngelaMos | 2026
 test_encoding.py
 """
 
-import pytest
 
 from core.encoding import decode, encode, xor_bytes
 

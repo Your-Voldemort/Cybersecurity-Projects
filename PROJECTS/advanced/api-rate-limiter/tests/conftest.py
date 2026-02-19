@@ -10,15 +10,12 @@ import time
 from collections.abc import AsyncGenerator, Generator
 from dataclasses import dataclass, field
 from typing import Any
-from unittest.mock import MagicMock
 
 import pytest
 from fastapi import FastAPI, Request
 from httpx import ASGITransport, AsyncClient
 from starlette.testclient import TestClient
 
-from fastapi_420.algorithms import create_algorithm
-from fastapi_420.algorithms.base import BaseAlgorithm
 from fastapi_420.algorithms.fixed_window import FixedWindowAlgorithm
 from fastapi_420.algorithms.sliding_window import SlidingWindowAlgorithm
 from fastapi_420.algorithms.token_bucket import TokenBucketAlgorithm
@@ -50,7 +47,6 @@ from fastapi_420.types import (
     RateLimitKey,
     RateLimitResult,
     RateLimitRule,
-    StorageType,
     TokenBucketState,
     WindowState,
 )
@@ -687,7 +683,7 @@ def rate_limiter_settings(
 
 
 @pytest.fixture
-async def memory_storage() -> AsyncGenerator[MemoryStorage, None]:
+async def memory_storage() -> AsyncGenerator[MemoryStorage]:
     """
     Create and manage MemoryStorage instance
     """
@@ -791,8 +787,7 @@ async def circuit_breaker() -> CircuitBreaker:
 async def rate_limiter(
     rate_limiter_settings: RateLimiterSettings,
     memory_storage: MemoryStorage,
-) -> AsyncGenerator[RateLimiter,
-                    None]:
+) -> AsyncGenerator[RateLimiter]:
     """
     Create and manage RateLimiter instance
     """
@@ -922,8 +917,7 @@ async def test_app_with_limiter(
 
 
 @pytest.fixture
-async def async_client(test_app: FastAPI) -> AsyncGenerator[AsyncClient,
-                                                            None]:
+async def async_client(test_app: FastAPI) -> AsyncGenerator[AsyncClient]:
     """
     Create async HTTP client for testing
     """
@@ -937,8 +931,7 @@ async def async_client(test_app: FastAPI) -> AsyncGenerator[AsyncClient,
 @pytest.fixture
 async def rate_limited_client(
     test_app_with_limiter: FastAPI,
-) -> AsyncGenerator[AsyncClient,
-                    None]:
+) -> AsyncGenerator[AsyncClient]:
     """
     Create async HTTP client with rate limiting
     """
@@ -950,7 +943,7 @@ async def rate_limited_client(
 
 
 @pytest.fixture
-def sync_client(test_app: FastAPI) -> Generator[TestClient, None, None]:
+def sync_client(test_app: FastAPI) -> Generator[TestClient]:
     """
     Create sync test client
     """

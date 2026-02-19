@@ -6,7 +6,6 @@ app.py
 from __future__ import annotations
 
 import uvicorn
-from typing import Annotated
 from contextlib import asynccontextmanager
 
 from fastapi import (
@@ -17,7 +16,6 @@ from fastapi import (
 from fastapi_420 import (
     RateLimiter,
     RateLimiterSettings,
-    RateLimitMiddleware,
     ScopedRateLimiter,
     FingerprintSettings,
     StorageSettings,

@@ -4,7 +4,6 @@ Encryption endpoints for X3DH prekey bundles
 """
 
 import logging
-from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status

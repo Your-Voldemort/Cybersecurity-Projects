@@ -8,7 +8,6 @@ import pytest
 from core.models import CommandType
 from core.protocol import Message, MessageType, pack, unpack
 
-
 TEST_KEY = "test-protocol-key"
 
 

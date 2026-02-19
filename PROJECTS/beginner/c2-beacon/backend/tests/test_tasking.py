@@ -172,11 +172,12 @@ class TestTaskManager:
             await asyncio.sleep(0.1)
             await task_manager.submit(_make_task("delayed"), db)
 
-        asyncio.create_task(delayed_submit())
+        background_task = asyncio.create_task(delayed_submit())
         retrieved = await asyncio.wait_for(
             task_manager.get_next("beacon-t"), timeout=2.0
         )
         assert retrieved.id == "delayed"
+        await background_task
 
     def test_remove_queue(self, task_manager: TaskManager) -> None:
         """

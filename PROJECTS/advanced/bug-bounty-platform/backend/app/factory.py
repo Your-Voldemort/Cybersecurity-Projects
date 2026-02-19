@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from config import settings, Environment, API_PREFIX
+from config import settings, API_PREFIX
 from core.database import sessionmanager
 from core.exceptions import BaseAppException
 from core.logging import configure_logging
@@ -74,8 +74,6 @@ def create_app() -> FastAPI:
     """
     Application factory
     """
-    is_production = settings.ENVIRONMENT == Environment.PRODUCTION
-
     app = FastAPI(
         title = settings.APP_NAME,
         summary = settings.APP_SUMMARY,

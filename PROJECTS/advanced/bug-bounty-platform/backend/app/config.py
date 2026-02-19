@@ -188,9 +188,8 @@ class Settings(BaseSettings):
         """
         Enforce security constraints in production environment.
         """
-        if self.ENVIRONMENT == Environment.PRODUCTION:
-            if self.DEBUG:
-                raise ValueError("DEBUG must be False in production")
+        if self.ENVIRONMENT == Environment.PRODUCTION and self.DEBUG:
+            raise ValueError("DEBUG must be False in production")
         return self
 
 

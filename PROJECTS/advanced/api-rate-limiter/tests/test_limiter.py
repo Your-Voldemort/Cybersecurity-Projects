@@ -10,11 +10,9 @@ from fastapi_420.config import RateLimiterSettings
 from fastapi_420.exceptions import EnhanceYourCalm, HTTP_420_ENHANCE_YOUR_CALM
 from fastapi_420.limiter import RateLimiter
 from fastapi_420.storage import MemoryStorage
-from fastapi_420.types import Algorithm, FingerprintLevel
+from fastapi_420.types import Algorithm
 
 from tests.conftest import (
-    WINDOW_MINUTE,
-    DEFAULT_LIMIT_REQUESTS,
     RequestFactory,
 )
 

@@ -1,16 +1,95 @@
 repos:
-  # Python Backend Ruff Checks
+  # Python Ruff Checks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.0
+    rev: v0.15.1
     hooks:
+      # Beginner projects
       - id: ruff
-        name: ruff check (backend)
+        name: ruff check (caesar-cipher)
         args: [--fix, --exit-non-zero-on-fix]
-        files: ^PROJECTS/api-security-scanner/backend/
-        exclude: ^PROJECTS/api-security-scanner/backend/(\.venv|__pycache__|\.pytest_cache)/
+        files: ^PROJECTS/beginner/caesar-cipher/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
 
+      - id: ruff
+        name: ruff check (keylogger)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/beginner/keylogger/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
 
-      # TODO: add additional ruff checks for remaining projects
+      - id: ruff
+        name: ruff check (dns-lookup)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/beginner/dns-lookup/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      - id: ruff
+        name: ruff check (metadata-scrubber-tool)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/beginner/metadata-scrubber-tool/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      - id: ruff
+        name: ruff check (network-traffic-analyzer)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/beginner/network-traffic-analyzer/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      - id: ruff
+        name: ruff check (base64-tool)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/beginner/base64-tool/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      - id: ruff
+        name: ruff check (c2-beacon backend)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/beginner/c2-beacon/backend/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      # Intermediate projects
+      - id: ruff
+        name: ruff check (api-security-scanner backend)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/intermediate/api-security-scanner/backend/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      - id: ruff
+        name: ruff check (siem-dashboard backend)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/intermediate/siem-dashboard/backend/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      # Advanced projects
+      - id: ruff
+        name: ruff check (bug-bounty-platform backend)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/advanced/bug-bounty-platform/backend/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      - id: ruff
+        name: ruff check (encrypted-p2p-chat backend)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/advanced/encrypted-p2p-chat/backend/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      - id: ruff
+        name: ruff check (api-rate-limiter)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/advanced/api-rate-limiter/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      - id: ruff
+        name: ruff check (ai-threat-detection backend)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^PROJECTS/advanced/ai-threat-detection/backend/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
+
+      # Templates
+      - id: ruff
+        name: ruff check (fullstack-template backend)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^TEMPLATES/fullstack-template/backend/
+        exclude: (\.venv|__pycache__|\.pytest_cache)/
 
 
       # TODO: add golangci checks for GO projects

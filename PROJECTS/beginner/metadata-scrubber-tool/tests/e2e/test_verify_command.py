@@ -13,7 +13,6 @@ from typer.testing import CliRunner
 
 from src.main import app
 
-
 runner = CliRunner()
 
 

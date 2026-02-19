@@ -44,7 +44,7 @@ def test_read_image_metadata(x):
     assert handler.metadata == metadata
     assert isinstance(metadata, dict)
 
-    if isinstance(handler, (JpegProcessor, PngProcessor)):
+    if isinstance(handler, JpegProcessor | PngProcessor):
         assert (
             handler.tags_to_delete is not None or handler.text_keys_to_delete is not None
         )

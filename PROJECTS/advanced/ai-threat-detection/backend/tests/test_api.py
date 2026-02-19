@@ -26,7 +26,7 @@ async def test_health_returns_200() -> None:
     data = response.json()
     assert data["status"] == "healthy"
     assert "uptime_seconds" in data
-    assert isinstance(data["uptime_seconds"], (int, float))
+    assert isinstance(data["uptime_seconds"], int | float)
     assert "pipeline_running" in data
 
 

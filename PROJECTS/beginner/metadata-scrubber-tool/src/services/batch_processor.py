@@ -19,7 +19,6 @@ from rich.console import Console
 
 from src.services.metadata_factory import MetadataFactory
 
-
 log = logging.getLogger("metadata-scrubber")
 console = Console()
 

@@ -27,7 +27,6 @@ from src.services.batch_processor import BatchProcessor
 from src.utils.display import print_batch_summary
 from src.utils.get_target_files import get_target_files
 
-
 console = Console()
 log = logging.getLogger("metadata-scrubber")
 

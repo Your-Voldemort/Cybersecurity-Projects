@@ -15,8 +15,6 @@ from fastapi_420.types import StorageType
 
 from tests.conftest import (
     WINDOW_MINUTE,
-    WINDOW_SECOND,
-    DEFAULT_LIMIT_REQUESTS,
 )
 
 
@@ -163,7 +161,6 @@ class TestMemoryStorageSlidingWindow:
         previous_window = current_window - 1
 
         prev_key = f"{key}:{previous_window}"
-        curr_key = f"{key}:{current_window}"
 
         storage._windows[prev_key] = storage._windows.__class__().__class__
         from fastapi_420.storage.memory import WindowEntry
@@ -360,7 +357,6 @@ class TestMemoryStorageCleanup:
         storage = MemoryStorage(cleanup_interval = 1)
         await storage.start_cleanup_task()
 
-        task = storage._cleanup_task
         await storage.close()
 
         assert storage._cleanup_task is None

@@ -5,7 +5,6 @@ from pathlib import Path
 
 from PIL import Image, PngImagePlugin
 
-
 dest_dir = Path("tests/assets/test_images")
 
 # Generate 45 PNG images with various metadata

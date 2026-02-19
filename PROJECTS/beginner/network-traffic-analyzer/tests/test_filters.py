@@ -91,7 +91,7 @@ class TestFilterBuilder:
         Verify OR operator joins expressions
         """
         result = (
-            FilterBuilder().port(80).port(443).build(operator = "or")
+            FilterBuilder().port(80).port(443).build(operator="or")
         )
         assert result == "port 80 or port 443"
 
@@ -137,14 +137,14 @@ class TestCombineFilters:
         """
         Verify multiple filters combine with AND
         """
-        result = combine_filters(["tcp", "port 80"], operator = "and")
+        result = combine_filters(["tcp", "port 80"], operator="and")
         assert result == "(tcp) and (port 80)"
 
     def test_combine_multiple_or(self):
         """
         Verify multiple filters combine with OR
         """
-        result = combine_filters(["port 80", "port 443"], operator = "or")
+        result = combine_filters(["port 80", "port 443"], operator="or")
         assert result == "(port 80) or (port 443)"
 
 

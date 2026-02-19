@@ -115,7 +115,7 @@ class RuleEngine:
 
         for trule in _THRESHOLD_RULES:
             value = features.get(trule.feature_key, 0)
-            if isinstance(value, (int, float)) and value > trule.threshold:
+            if isinstance(value, int | float) and value > trule.threshold:
                 matched.append((trule.name, trule.score))
 
         if not matched:

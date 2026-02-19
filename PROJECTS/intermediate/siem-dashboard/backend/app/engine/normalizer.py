@@ -4,7 +4,8 @@ normalizer.py
 """
 
 from datetime import datetime, UTC
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from app.models.LogEvent import SourceType
 

@@ -15,7 +15,6 @@ from rich.text import Text
 
 from src.utils.formatter import clean_value
 
-
 console = Console()
 
 

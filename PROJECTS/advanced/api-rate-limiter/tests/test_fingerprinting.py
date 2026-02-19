@@ -67,7 +67,7 @@ class TestIPExtractor:
     def test_ipv6_custom_prefix_length(self) -> None:
         extractor = IPExtractor(ipv6_prefix_length = 48)
         request = RequestFactory.create(client_ip = TEST_IP_V6)
-        raw_ip, normalized_ip = extractor.extract(request)
+        _, normalized_ip = extractor.extract(request)
 
         assert "::" in normalized_ip or normalized_ip != TEST_IP_V6
 
@@ -75,7 +75,7 @@ class TestIPExtractor:
         extractor = IPExtractor()
         ipv4_mapped = "::ffff:192.168.1.100"
         request = RequestFactory.create(client_ip = ipv4_mapped)
-        raw_ip, normalized_ip = extractor.extract(request)
+        _, normalized_ip = extractor.extract(request)
 
         assert normalized_ip == "192.168.1.100"
 
@@ -323,7 +323,7 @@ class TestAuthExtractor:
         extractor = AuthExtractor(hash_identifiers = False)
         request = RequestFactory.with_auth(
             auth_type = "bearer",
-            token = "invalid"
+            token = "invalid"  # noqa: S106
         )
         identifier = extractor.extract(request)
 
