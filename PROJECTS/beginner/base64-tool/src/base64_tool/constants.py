@@ -62,6 +62,7 @@ class ScoreWeight:
     URL_RATIO_CAP: Final[float] = 0.35
     URL_DECODE_CHANGED: Final[float] = 0.15
 
+
 BASE64_CHARSET: Final[
     frozenset[str]
 ] = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
@@ -75,4 +76,3 @@ BASE32_CHARSET: Final[frozenset[str]] = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZ234
 HEX_CHARSET: Final[frozenset[str]] = frozenset("0123456789abcdefABCDEF")
 
 HEX_SEPARATORS: Final[frozenset[str]] = frozenset(" :.-")
-

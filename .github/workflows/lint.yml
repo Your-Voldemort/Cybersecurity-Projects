@@ -87,9 +87,12 @@ jobs:
             type: biome
             path: TEMPLATES/fullstack-template/frontend
           # Go
+          - name: simple-vulnerability-scanner
+            type: go
+            path: PROJECTS/beginner/simple-vulnerability-scanner
           - name: docker-security-audit
             type: go
-            path: PROJECTS/beginner/docker-security-audit
+            path: PROJECTS/intermediate/docker-security-audit
 
     defaults:
       run:
@@ -142,8 +145,12 @@ jobs:
       if: matrix.type == 'go'
       uses: actions/setup-go@v5
       with:
-        go-version: '1.21'
+        go-version-file: ${{ matrix.path }}/go.mod
         cache-dependency-path: ${{ matrix.path }}/go.sum
+
+    - name: Install golangci-lint
+      if: matrix.type == 'go'
+      run: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
     # Ruff Linting
     - name: Run ruff
@@ -183,7 +190,7 @@ jobs:
       id: golangci
       run: |
         echo "Running golangci-lint..."
-        if golangci-lint run --out-format=colored-line-number > golangci-output.txt 2>&1; then
+        if golangci-lint run > golangci-output.txt 2>&1; then
           echo "GOLANGCI_PASSED=true" >> $GITHUB_ENV
           echo "No golangci-lint errors found!"
         else

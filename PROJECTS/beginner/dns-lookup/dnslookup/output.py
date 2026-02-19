@@ -24,7 +24,6 @@ from dnslookup.resolver import (
 
 console = Console()
 
-
 RECORD_COLORS: dict[RecordType,
                     str] = {
                         RecordType.A: "green",

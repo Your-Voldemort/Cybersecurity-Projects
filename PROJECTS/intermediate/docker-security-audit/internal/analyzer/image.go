@@ -1,5 +1,5 @@
 /*
-AngelaMos | 2026
+© AngelaMos | 2026
 image.go
 */
 
@@ -13,7 +13,7 @@ import (
 	"github.com/CarterPerez-dev/docksec/internal/benchmark"
 	"github.com/CarterPerez-dev/docksec/internal/docker"
 	"github.com/CarterPerez-dev/docksec/internal/finding"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 )
 
 type ImageAnalyzer struct {
@@ -62,7 +62,7 @@ func (a *ImageAnalyzer) Analyze(
 
 func (a *ImageAnalyzer) analyzeImage(
 	target finding.Target,
-	info types.ImageInspect,
+	info image.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -75,7 +75,7 @@ func (a *ImageAnalyzer) analyzeImage(
 
 func (a *ImageAnalyzer) checkRootUser(
 	target finding.Target,
-	info types.ImageInspect,
+	info image.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -100,7 +100,7 @@ func (a *ImageAnalyzer) checkRootUser(
 
 func (a *ImageAnalyzer) checkHealthcheck(
 	target finding.Target,
-	info types.ImageInspect,
+	info image.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -139,7 +139,7 @@ func (a *ImageAnalyzer) checkHealthcheck(
 
 func (a *ImageAnalyzer) checkExposedPorts(
 	target finding.Target,
-	info types.ImageInspect,
+	info image.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 

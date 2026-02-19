@@ -22,7 +22,7 @@ from base64_tool.encoders import try_decode
 from base64_tool.utils import is_printable_text
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen = True, slots = True)
 class DetectionResult:
     format: EncodingFormat
     confidence: float
@@ -152,9 +152,7 @@ def _score_hex(data: str) -> float:
     else:
         score -= W.HEX_NO_ALPHA_PENALTY
 
-    is_consistent_case = (
-        hex_only == hex_only.lower() or hex_only == hex_only.upper()
-    )
+    is_consistent_case = (hex_only == hex_only.lower() or hex_only == hex_only.upper())
     if is_consistent_case:
         score += W.HEX_CONSISTENT_CASE
 
@@ -188,20 +186,22 @@ def _score_url(data: str) -> float:
 
     decoded = try_decode(data, EncodingFormat.URL)
     if decoded is not None:
-        decoded_text = decoded.decode("utf-8", errors="replace")
+        decoded_text = decoded.decode("utf-8", errors = "replace")
         if decoded_text != data:
             score += W.URL_DECODE_CHANGED
 
     return min(score, 1.0)
 
 
-_SCORERS: dict[EncodingFormat, Callable[[str], float]] = {
-    EncodingFormat.BASE64: _score_base64,
-    EncodingFormat.BASE64URL: _score_base64url,
-    EncodingFormat.BASE32: _score_base32,
-    EncodingFormat.HEX: _score_hex,
-    EncodingFormat.URL: _score_url,
-}
+_SCORERS: dict[EncodingFormat,
+               Callable[[str],
+                        float]] = {
+                            EncodingFormat.BASE64: _score_base64,
+                            EncodingFormat.BASE64URL: _score_base64url,
+                            EncodingFormat.BASE32: _score_base32,
+                            EncodingFormat.HEX: _score_hex,
+                            EncodingFormat.URL: _score_url,
+                        }
 
 
 def score_all_formats(data: str) -> dict[EncodingFormat, float]:
@@ -216,13 +216,14 @@ def detect_encoding(data: str) -> list[DetectionResult]:
             decoded = try_decode(data, fmt)
             results.append(
                 DetectionResult(
-                    format=fmt,
-                    confidence=round(confidence, 2),
-                    decoded=decoded,
+                    format = fmt,
+                    confidence = round(confidence,
+                                       2),
+                    decoded = decoded,
                 )
             )
 
-    results.sort(key=lambda r: r.confidence, reverse=True)
+    results.sort(key = lambda r: r.confidence, reverse = True)
     return results
 
 

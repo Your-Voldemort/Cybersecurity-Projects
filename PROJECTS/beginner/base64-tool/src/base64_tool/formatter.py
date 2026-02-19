@@ -20,7 +20,7 @@ from base64_tool.peeler import PeelResult
 from base64_tool.utils import safe_bytes_preview
 
 
-console = Console(stderr=True)
+console = Console(stderr = True)
 
 
 def is_piped() -> bool:
@@ -37,44 +37,49 @@ def print_encoded(result: str, fmt: EncodingFormat) -> None:
         write_raw(result)
         return
     panel = Panel(
-        Text(result, style="green"),
-        title=f"[bold cyan]{fmt.value}[/bold cyan] encoded",
-        border_style="cyan",
+        Text(result,
+             style = "green"),
+        title = f"[bold cyan]{fmt.value}[/bold cyan] encoded",
+        border_style = "cyan",
     )
     console.print(panel)
 
 
 def print_decoded(result: bytes) -> None:
-    preview = safe_bytes_preview(result, length=4096)
+    preview = safe_bytes_preview(result, length = 4096)
     if is_piped():
         write_raw(preview)
         return
     panel = Panel(
-        Text(preview, style="green"),
-        title="[bold cyan]Decoded[/bold cyan]",
-        border_style="cyan",
+        Text(preview,
+             style = "green"),
+        title = "[bold cyan]Decoded[/bold cyan]",
+        border_style = "cyan",
     )
     console.print(panel)
 
 
 def print_score_breakdown(
-    scores: dict[EncodingFormat, float],
+    scores: dict[EncodingFormat,
+                 float],
 ) -> None:
     table = Table(
-        title="Score Breakdown",
-        show_header=True,
-        header_style="bold magenta",
+        title = "Score Breakdown",
+        show_header = True,
+        header_style = "bold magenta",
     )
-    table.add_column("Format", style="cyan", min_width=10)
+    table.add_column("Format", style = "cyan", min_width = 10)
     table.add_column(
         "Score",
-        justify="right",
-        min_width=8,
+        justify = "right",
+        min_width = 8,
     )
-    table.add_column("Status", min_width=10)
+    table.add_column("Status", min_width = 10)
 
     sorted_scores = sorted(
-        scores.items(), key=lambda x: x[1], reverse=True,
+        scores.items(),
+        key = lambda x: x[1],
+        reverse = True,
     )
     for fmt, score in sorted_scores:
         color = _confidence_color(score)
@@ -96,7 +101,8 @@ def print_score_breakdown(
 def print_detection(
     results: list[DetectionResult],
     *,
-    verbose_scores: dict[EncodingFormat, float] | None = None,
+    verbose_scores: dict[EncodingFormat,
+                         float] | None = None,
 ) -> None:
     if verbose_scores is not None:
         print_score_breakdown(verbose_scores)
@@ -107,18 +113,18 @@ def print_detection(
         return
 
     table = Table(
-        title="Detection Results",
-        show_header=True,
-        header_style="bold magenta",
+        title = "Detection Results",
+        show_header = True,
+        header_style = "bold magenta",
     )
-    table.add_column("Format", style="cyan", min_width=10)
+    table.add_column("Format", style = "cyan", min_width = 10)
     table.add_column(
         "Confidence",
-        justify="right",
-        style="green",
-        min_width=12,
+        justify = "right",
+        style = "green",
+        min_width = 12,
     )
-    table.add_column("Decoded Preview", style="dim")
+    table.add_column("Decoded Preview", style = "dim")
 
     for result in results:
         confidence_str = f"{result.confidence:.0%}"
@@ -171,18 +177,20 @@ def print_peel_result(
 
     console.print()
 
-    preview = safe_bytes_preview(result.final_output, length=4096)
+    preview = safe_bytes_preview(result.final_output, length = 4096)
     panel = Panel(
-        Text(preview, style="bold green"),
-        title="[bold]Final Output[/bold]",
-        border_style="green",
-        subtitle=(f"[dim]{layer_count} layer{suffix} peeled[/dim]"),
+        Text(preview,
+             style = "bold green"),
+        title = "[bold]Final Output[/bold]",
+        border_style = "green",
+        subtitle = (f"[dim]{layer_count} layer{suffix} peeled[/dim]"),
     )
     console.print(panel)
 
 
 def print_chain_result(
-    steps: list[tuple[EncodingFormat, str]],
+    steps: list[tuple[EncodingFormat,
+                      str]],
     final: str,
 ) -> None:
     if is_piped():
@@ -196,7 +204,7 @@ def print_chain_result(
     for i, (fmt, intermediate) in enumerate(steps):
         marker = "start" if i == 0 else "step"
         arrow = f"  [{marker}] " if i == 0 else "    -> "
-        truncated = intermediate[:PREVIEW_LENGTH]
+        truncated = intermediate[: PREVIEW_LENGTH]
         ellipsis = "..." if len(intermediate) > PREVIEW_LENGTH else ""
         console.print(
             f"{arrow}[cyan]{fmt.value}[/cyan]  "
@@ -205,10 +213,11 @@ def print_chain_result(
 
     console.print()
     panel = Panel(
-        Text(final, style="green"),
-        title="[bold]Chain Result[/bold]",
-        border_style="cyan",
-        subtitle=f"[dim]{len(steps)} steps[/dim]",
+        Text(final,
+             style = "green"),
+        title = "[bold]Chain Result[/bold]",
+        border_style = "cyan",
+        subtitle = f"[dim]{len(steps)} steps[/dim]",
     )
     console.print(panel)
 

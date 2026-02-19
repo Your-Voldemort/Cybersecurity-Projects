@@ -14,7 +14,7 @@ from base64_tool.detector import detect_best, score_all_formats
 from base64_tool.utils import safe_bytes_preview, truncate
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen = True, slots = True)
 class PeelLayer:
     depth: int
     format: EncodingFormat
@@ -24,7 +24,7 @@ class PeelLayer:
     all_scores: tuple[tuple[EncodingFormat, float], ...] = ()
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen = True, slots = True)
 class PeelResult:
     layers: tuple[PeelLayer, ...]
     final_output: bytes
@@ -52,20 +52,16 @@ def peel(
         if detection.decoded is None:
             break
 
-        scores = (
-            tuple(score_all_formats(current_text).items())
-            if verbose
-            else ()
-        )
+        scores = (tuple(score_all_formats(current_text).items()) if verbose else ())
 
         decoded_bytes = detection.decoded
         layer = PeelLayer(
-            depth=depth + 1,
-            format=detection.format,
-            confidence=detection.confidence,
-            encoded_preview=truncate(current_text),
-            decoded_preview=safe_bytes_preview(decoded_bytes),
-            all_scores=scores,
+            depth = depth + 1,
+            format = detection.format,
+            confidence = detection.confidence,
+            encoded_preview = truncate(current_text),
+            decoded_preview = safe_bytes_preview(decoded_bytes),
+            all_scores = scores,
         )
         layers.append(layer)
         current_bytes = decoded_bytes
@@ -76,7 +72,7 @@ def peel(
             break
 
     return PeelResult(
-        layers=tuple(layers),
-        final_output=current_bytes,
-        success=len(layers) > 0,
+        layers = tuple(layers),
+        final_output = current_bytes,
+        success = len(layers) > 0,
     )

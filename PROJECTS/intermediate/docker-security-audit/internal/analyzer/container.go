@@ -1,5 +1,5 @@
 /*
-AngelaMos | 2026
+© AngelaMos | 2026
 container.go
 */
 
@@ -13,7 +13,7 @@ import (
 	"github.com/CarterPerez-dev/docksec/internal/docker"
 	"github.com/CarterPerez-dev/docksec/internal/finding"
 	"github.com/CarterPerez-dev/docksec/internal/rules"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 )
 
 type ContainerAnalyzer struct {
@@ -49,7 +49,7 @@ func (a *ContainerAnalyzer) Analyze(
 }
 
 func (a *ContainerAnalyzer) analyzeContainer(
-	info types.ContainerJSON,
+	info container.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 	target := finding.Target{
@@ -75,7 +75,7 @@ func (a *ContainerAnalyzer) analyzeContainer(
 
 func (a *ContainerAnalyzer) checkPrivileged(
 	target finding.Target,
-	info types.ContainerJSON,
+	info container.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -95,7 +95,7 @@ func (a *ContainerAnalyzer) checkPrivileged(
 
 func (a *ContainerAnalyzer) checkCapabilities(
 	target finding.Target,
-	info types.ContainerJSON,
+	info container.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -127,7 +127,7 @@ func (a *ContainerAnalyzer) checkCapabilities(
 
 func (a *ContainerAnalyzer) checkMounts(
 	target finding.Target,
-	info types.ContainerJSON,
+	info container.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -172,7 +172,7 @@ func (a *ContainerAnalyzer) checkMounts(
 
 func (a *ContainerAnalyzer) checkNamespaces(
 	target finding.Target,
-	info types.ContainerJSON,
+	info container.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -225,7 +225,7 @@ func (a *ContainerAnalyzer) checkNamespaces(
 
 func (a *ContainerAnalyzer) checkSecurityOptions(
 	target finding.Target,
-	info types.ContainerJSON,
+	info container.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -298,7 +298,7 @@ func (a *ContainerAnalyzer) checkSecurityOptions(
 
 func (a *ContainerAnalyzer) checkResourceLimits(
 	target finding.Target,
-	info types.ContainerJSON,
+	info container.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 
@@ -342,7 +342,7 @@ func (a *ContainerAnalyzer) checkResourceLimits(
 
 func (a *ContainerAnalyzer) checkReadonlyRootfs(
 	target finding.Target,
-	info types.ContainerJSON,
+	info container.InspectResponse,
 ) finding.Collection {
 	var findings finding.Collection
 

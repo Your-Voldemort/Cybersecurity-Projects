@@ -25,7 +25,12 @@ func TestE2E_DockerfileAnalysis(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("analyze bad-secrets.Dockerfile end-to-end", func(t *testing.T) {
-		path := filepath.Join("..", "testdata", "dockerfiles", "bad-secrets.Dockerfile")
+		path := filepath.Join(
+			"..",
+			"testdata",
+			"dockerfiles",
+			"bad-secrets.Dockerfile",
+		)
 
 		require.FileExists(t, path, "Test file should exist")
 
@@ -47,7 +52,12 @@ func TestE2E_DockerfileAnalysis(t *testing.T) {
 	})
 
 	t.Run("analyze good-security.Dockerfile end-to-end", func(t *testing.T) {
-		path := filepath.Join("..", "testdata", "dockerfiles", "good-security.Dockerfile")
+		path := filepath.Join(
+			"..",
+			"testdata",
+			"dockerfiles",
+			"good-security.Dockerfile",
+		)
 
 		require.FileExists(t, path, "Test file should exist")
 
@@ -73,7 +83,12 @@ func TestE2E_ComposeAnalysis(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("analyze bad-docker-socket.yml end-to-end", func(t *testing.T) {
-		path := filepath.Join("..", "testdata", "compose", "bad-docker-socket.yml")
+		path := filepath.Join(
+			"..",
+			"testdata",
+			"compose",
+			"bad-docker-socket.yml",
+		)
 
 		require.FileExists(t, path, "Test file should exist")
 
@@ -83,8 +98,11 @@ func TestE2E_ComposeAnalysis(t *testing.T) {
 		require.NoError(t, err, "Analyze should not return error")
 		require.NotEmpty(t, findings, "Should have findings")
 
-		assert.True(t, findings.HasSeverityAtOrAbove(finding.SeverityCritical),
-			"Should detect CRITICAL issues")
+		assert.True(
+			t,
+			findings.HasSeverityAtOrAbove(finding.SeverityCritical),
+			"Should detect CRITICAL issues",
+		)
 
 		counts := findings.CountBySeverity()
 		t.Logf("Findings by severity: %+v", counts)
@@ -95,7 +113,12 @@ func TestE2E_ComposeAnalysis(t *testing.T) {
 	})
 
 	t.Run("analyze good-production.yml end-to-end", func(t *testing.T) {
-		path := filepath.Join("..", "testdata", "compose", "good-production.yml")
+		path := filepath.Join(
+			"..",
+			"testdata",
+			"compose",
+			"good-production.yml",
+		)
 
 		require.FileExists(t, path, "Test file should exist")
 
@@ -104,8 +127,11 @@ func TestE2E_ComposeAnalysis(t *testing.T) {
 		findings, err := a.Analyze(ctx)
 		require.NoError(t, err, "Analyze should not return error")
 
-		assert.False(t, findings.HasSeverityAtOrAbove(finding.SeverityCritical),
-			"Production compose should have no CRITICAL findings")
+		assert.False(
+			t,
+			findings.HasSeverityAtOrAbove(finding.SeverityCritical),
+			"Production compose should have no CRITICAL findings",
+		)
 
 		counts := findings.CountBySeverity()
 		t.Logf("Findings by severity: %+v", counts)
@@ -126,22 +152,42 @@ func TestE2E_MultipleFiles(t *testing.T) {
 		wantIssues bool
 	}{
 		{
-			path:       filepath.Join("..", "testdata", "dockerfiles", "bad-secrets.Dockerfile"),
+			path: filepath.Join(
+				"..",
+				"testdata",
+				"dockerfiles",
+				"bad-secrets.Dockerfile",
+			),
 			analyzer:   func(p string) analyzer.Analyzer { return analyzer.NewDockerfileAnalyzer(p) },
 			wantIssues: true,
 		},
 		{
-			path:       filepath.Join("..", "testdata", "dockerfiles", "good-minimal.Dockerfile"),
+			path: filepath.Join(
+				"..",
+				"testdata",
+				"dockerfiles",
+				"good-minimal.Dockerfile",
+			),
 			analyzer:   func(p string) analyzer.Analyzer { return analyzer.NewDockerfileAnalyzer(p) },
 			wantIssues: false,
 		},
 		{
-			path:       filepath.Join("..", "testdata", "compose", "bad-privileged.yml"),
+			path: filepath.Join(
+				"..",
+				"testdata",
+				"compose",
+				"bad-privileged.yml",
+			),
 			analyzer:   func(p string) analyzer.Analyzer { return analyzer.NewComposeAnalyzer(p) },
 			wantIssues: true,
 		},
 		{
-			path:       filepath.Join("..", "testdata", "compose", "good-production.yml"),
+			path: filepath.Join(
+				"..",
+				"testdata",
+				"compose",
+				"good-production.yml",
+			),
 			analyzer:   func(p string) analyzer.Analyzer { return analyzer.NewComposeAnalyzer(p) },
 			wantIssues: false,
 		},
@@ -158,7 +204,12 @@ func TestE2E_MultipleFiles(t *testing.T) {
 			require.NoError(t, err, "Analyze should not error for %s", f.path)
 
 			if f.wantIssues {
-				assert.NotEmpty(t, findings, "File %s should have findings", f.path)
+				assert.NotEmpty(
+					t,
+					findings,
+					"File %s should have findings",
+					f.path,
+				)
 			}
 
 			allFindings = append(allFindings, findings...)
@@ -166,7 +217,11 @@ func TestE2E_MultipleFiles(t *testing.T) {
 		}
 
 		t.Logf("Total findings across all files: %d", allFindings.Total())
-		assert.NotEmpty(t, allFindings, "Should have findings across all files")
+		assert.NotEmpty(
+			t,
+			allFindings,
+			"Should have findings across all files",
+		)
 
 		counts := allFindings.CountBySeverity()
 		t.Logf("Overall severity distribution: %+v", counts)
@@ -191,12 +246,28 @@ func TestE2E_FindingProperties(t *testing.T) {
 			assert.NotEmpty(t, f.ID, "Finding should have ID")
 			assert.NotEmpty(t, f.RuleID, "Finding should have RuleID")
 			assert.NotEmpty(t, f.Title, "Finding should have Title")
-			assert.NotEmpty(t, f.Description, "Finding should have Description")
+			assert.NotEmpty(
+				t,
+				f.Description,
+				"Finding should have Description",
+			)
 			assert.NotEmpty(t, f.Category, "Finding should have Category")
-			assert.NotEmpty(t, f.Remediation, "Finding should have Remediation")
+			assert.NotEmpty(
+				t,
+				f.Remediation,
+				"Finding should have Remediation",
+			)
 			assert.NotZero(t, f.Severity, "Finding should have Severity")
-			assert.NotEmpty(t, f.Target.Type, "Finding should have Target.Type")
-			assert.NotEmpty(t, f.Target.Name, "Finding should have Target.Name")
+			assert.NotEmpty(
+				t,
+				f.Target.Type,
+				"Finding should have Target.Type",
+			)
+			assert.NotEmpty(
+				t,
+				f.Target.Name,
+				"Finding should have Target.Name",
+			)
 		}
 	})
 
@@ -205,12 +276,25 @@ func TestE2E_FindingProperties(t *testing.T) {
 		for _, f := range findings {
 			if f.Location != nil {
 				hasLocation = true
-				assert.NotEmpty(t, f.Location.Path, "Location should have Path")
-				assert.Greater(t, f.Location.Line, 0, "Location should have Line > 0")
+				assert.NotEmpty(
+					t,
+					f.Location.Path,
+					"Location should have Path",
+				)
+				assert.Greater(
+					t,
+					f.Location.Line,
+					0,
+					"Location should have Line > 0",
+				)
 				break
 			}
 		}
-		assert.True(t, hasLocation, "At least one finding should have location info")
+		assert.True(
+			t,
+			hasLocation,
+			"At least one finding should have location info",
+		)
 	})
 
 	t.Run("CIS findings have CIS control info", func(t *testing.T) {
@@ -219,8 +303,16 @@ func TestE2E_FindingProperties(t *testing.T) {
 			if len(f.RuleID) >= 4 && f.RuleID[:4] == "CIS-" {
 				hasCIS = true
 				if f.CISControl != nil {
-					assert.NotEmpty(t, f.CISControl.ID, "CISControl should have ID")
-					assert.NotEmpty(t, f.CISControl.Title, "CISControl should have Title")
+					assert.NotEmpty(
+						t,
+						f.CISControl.ID,
+						"CISControl should have ID",
+					)
+					assert.NotEmpty(
+						t,
+						f.CISControl.Title,
+						"CISControl should have Title",
+					)
 				}
 				break
 			}
@@ -235,7 +327,12 @@ func TestE2E_SeverityFiltering(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	path := filepath.Join("..", "testdata", "compose", "bad-docker-socket.yml")
+	path := filepath.Join(
+		"..",
+		"testdata",
+		"compose",
+		"bad-docker-socket.yml",
+	)
 
 	a := analyzer.NewComposeAnalyzer(path)
 	findings, err := a.Analyze(ctx)
@@ -247,7 +344,12 @@ func TestE2E_SeverityFiltering(t *testing.T) {
 		high := findings.BySeverity(finding.SeverityHigh)
 		medium := findings.BySeverity(finding.SeverityMedium)
 
-		t.Logf("CRITICAL: %d, HIGH: %d, MEDIUM: %d", len(critical), len(high), len(medium))
+		t.Logf(
+			"CRITICAL: %d, HIGH: %d, MEDIUM: %d",
+			len(critical),
+			len(high),
+			len(medium),
+		)
 
 		assert.NotEmpty(t, critical, "Should have CRITICAL findings")
 
@@ -278,7 +380,12 @@ func TestE2E_FileNotFound(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("nonexistent Dockerfile", func(t *testing.T) {
-		path := filepath.Join("..", "testdata", "dockerfiles", "does-not-exist.Dockerfile")
+		path := filepath.Join(
+			"..",
+			"testdata",
+			"dockerfiles",
+			"does-not-exist.Dockerfile",
+		)
 
 		a := analyzer.NewDockerfileAnalyzer(path)
 		_, err := a.Analyze(ctx)
@@ -288,7 +395,12 @@ func TestE2E_FileNotFound(t *testing.T) {
 	})
 
 	t.Run("nonexistent compose file", func(t *testing.T) {
-		path := filepath.Join("..", "testdata", "compose", "does-not-exist.yml")
+		path := filepath.Join(
+			"..",
+			"testdata",
+			"compose",
+			"does-not-exist.yml",
+		)
 
 		a := analyzer.NewComposeAnalyzer(path)
 		_, err := a.Analyze(ctx)

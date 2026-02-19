@@ -1,5 +1,5 @@
 /*
-CarterPerez-dev | 2026
+© AngelaMos | 2026
 client.go
 */
 
@@ -90,7 +90,7 @@ func (c *Client) ServerVersion(ctx context.Context) (types.Version, error) {
 func (c *Client) ListContainers(
 	ctx context.Context,
 	all bool,
-) ([]types.Container, error) {
+) ([]container.Summary, error) {
 	listCtx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
@@ -107,13 +107,13 @@ func (c *Client) ListContainers(
 func (c *Client) InspectContainer(
 	ctx context.Context,
 	containerID string,
-) (types.ContainerJSON, error) {
+) (container.InspectResponse, error) {
 	inspectCtx, cancel := context.WithTimeout(ctx, config.InspectTimeout)
 	defer cancel()
 
 	info, err := c.api.ContainerInspect(inspectCtx, containerID)
 	if err != nil {
-		return types.ContainerJSON{}, fmt.Errorf(
+		return container.InspectResponse{}, fmt.Errorf(
 			"inspecting container %s: %w",
 			containerID,
 			err,
@@ -136,13 +136,13 @@ func (c *Client) ListImages(ctx context.Context) ([]image.Summary, error) {
 func (c *Client) InspectImage(
 	ctx context.Context,
 	imageID string,
-) (types.ImageInspect, error) {
+) (image.InspectResponse, error) {
 	inspectCtx, cancel := context.WithTimeout(ctx, config.InspectTimeout)
 	defer cancel()
 
-	info, _, err := c.api.ImageInspectWithRaw(inspectCtx, imageID)
+	info, err := c.api.ImageInspect(inspectCtx, imageID)
 	if err != nil {
-		return types.ImageInspect{}, fmt.Errorf(
+		return image.InspectResponse{}, fmt.Errorf(
 			"inspecting image %s: %w",
 			imageID,
 			err,

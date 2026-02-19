@@ -92,8 +92,24 @@ repos:
         exclude: (\.venv|__pycache__|\.pytest_cache)/
 
 
-      # TODO: add golangci checks for GO projects
+  # Go golangci-lint Checks
+  - repo: local
+    hooks:
+      - id: golangci-lint-simple-vulnerability-scanner
+        name: golangci-lint (simple-vulnerability-scanner)
+        entry: bash -c 'cd PROJECTS/beginner/simple-vulnerability-scanner && golangci-lint run --fix'
+        language: system
+        files: ^PROJECTS/beginner/simple-vulnerability-scanner/
+        types: [go]
+        pass_filenames: false
 
+      - id: golangci-lint-docker-security-audit
+        name: golangci-lint (docker-security-audit)
+        entry: bash -c 'cd PROJECTS/intermediate/docker-security-audit && golangci-lint run --fix'
+        language: system
+        files: ^PROJECTS/intermediate/docker-security-audit/
+        types: [go]
+        pass_filenames: false
 
   # Biome Frontend Checks
   - repo: local

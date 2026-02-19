@@ -1,5 +1,5 @@
 /*
-AngelaMos | 2026
+© AngelaMos | 2026
 container_test.go
 */
 
@@ -12,23 +12,33 @@ import (
 	"testing"
 
 	"github.com/CarterPerez-dev/docksec/internal/finding"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func loadContainerJSON(t *testing.T, filename string) types.ContainerJSON {
+func loadContainerJSON(
+	t *testing.T,
+	filename string,
+) container.InspectResponse {
 	t.Helper()
 
-	path := filepath.Join("..", "..", "tests", "testdata", "containers", filename)
+	path := filepath.Join(
+		"..",
+		"..",
+		"tests",
+		"testdata",
+		"containers",
+		filename,
+	)
 	data, err := os.ReadFile(path)
 	require.NoError(t, err, "Failed to read container JSON file")
 
-	var container types.ContainerJSON
-	err = json.Unmarshal(data, &container)
+	var ctr container.InspectResponse
+	err = json.Unmarshal(data, &ctr)
 	require.NoError(t, err, "Failed to unmarshal container JSON")
 
-	return container
+	return ctr
 }
 
 func TestContainerAnalyzer_PrivilegedContainer(t *testing.T) {
