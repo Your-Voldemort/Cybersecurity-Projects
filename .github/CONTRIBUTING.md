@@ -71,17 +71,10 @@ PROJECTS/
 ├── beginner/
 │   └── simple-port-scanner/
 │       ├── README.md
-│       ├── learn/
-│       │   ├── 00-OVERVIEW.md
-│       │   ├── 01-CONCEPTS.md
-│       │   ├── 02-ARCHITECTURE.md
-│       │   ├── 03-IMPLEMENTATION.md
-│       │   └── 04-CHALLENGES.md
 │       └── src/
 ├── intermediate/
 │   └── oauth-token-analyzer/
 │       ├── README.md
-│       ├── learn/
 │       ├── .env.example
 │       ├── requirements.txt
 │       ├── src/
@@ -92,7 +85,6 @@ PROJECTS/
 └── advanced/
     └── bug-bounty-platform/
         ├── README.md
-        ├── learn/
         ├── .env.example
         ├── docker-compose.yml
         ├── backend/
@@ -101,70 +93,8 @@ PROJECTS/
         └── examples/
 ```
 
-### 4. Educational Documentation (learn/ Folder)
 
-All projects must include a `learn/` directory with educational documentation. This helps users understand not just how to use your project, but how it works and what security concepts it teaches.
-
-**Required files:**
-
-Copy the template from `.github/learn-folder-template/` to get started:
-
-```bash
-cp -r .github/learn-folder-template PROJECTS/[difficulty]/[project-name]/learn
-cd PROJECTS/[difficulty]/[project-name]/learn
-rm README.md  # Remove the template instructions
-```
-
-Then fill in these five files:
-
-1. **00-OVERVIEW.md** - Project introduction
-   - What the project does and why it matters
-   - Real world scenarios where it applies
-   - What users will learn (security concepts, technical skills)
-   - Prerequisites and quick start instructions
-   - Common issues and solutions
-
-2. **01-CONCEPTS.md** - Security concepts and theory
-   - Core security concepts explained in depth
-   - Common attacks and defense strategies
-   - Real world examples and breaches
-   - Industry standards (OWASP, MITRE, CWE)
-   - Further reading resources
-
-3. **02-ARCHITECTURE.md** - System design
-   - High level architecture diagrams
-   - Component breakdown and responsibilities
-   - Data flow examples
-   - Design decisions and trade-offs
-   - Performance and security considerations
-
-4. **03-IMPLEMENTATION.md** - Code walkthrough
-   - Step by step implementation guide
-   - Real code from the project with file:line references
-   - Security implementation details
-   - Common pitfalls and debugging tips
-   - Testing and deployment
-
-5. **04-CHALLENGES.md** - Extension ideas
-   - Easy to expert level challenges
-   - Hints without full solutions
-   - Real world integration ideas
-   - Performance and security challenges
-
-**Quality standards:**
-
-- Reference actual code with `filename:line` format
-- Include real world examples (breaches, CVEs, incidents)
-- Use ASCII diagrams for architecture and data flow
-- Show common mistakes and how to avoid them
-- Write in a clear, human voice (avoid marketing speak)
-- See `.github/learn-folder-template/README.md` for detailed writing guidelines
-
-**Checklist:**
-
-Use `.github/learn-folder-template/CHECKLIST.md` to verify your learn/ folder is complete before submitting.
-
-### 5. Package Managers if using Python and or Node (Doesn't matter what you use for any other framework/libary/language though)
+### 4. Package Managers if using Python and or Node (Doesn't matter what you use for any other framework/libary/language though)
 
 **Python:** Use [uv](https://github.com/astral-sh/uv) for dependency management. It's faster, better, and if you think pip or poetry is superior in 2026, you're simply not ready to contribute here. (I'm only slightly joking..... but use uv pls...)
 ```bash
@@ -281,7 +211,6 @@ git push origin add-your-project-name
 - [ ] Code follows existing style and conventions
 - [ ] Project has been tested
 - [ ] README documentation is complete
-- [ ] learn/ folder is complete with all 5 required files
 - [ ] Educational documentation follows quality standards
 - [ ] No security vulnerabilities introduced
 - [ ] Read and followed CONTRIBUTING.md guidelines
