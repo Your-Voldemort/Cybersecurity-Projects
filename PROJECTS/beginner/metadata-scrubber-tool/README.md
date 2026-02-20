@@ -15,7 +15,7 @@
 > Privacy-focused CLI that strips sensitive metadata from images, PDFs, and Office documents.
 
 *This is a quick overview — security theory, architecture, and full walkthroughs are in the [learn modules](#learn).*
-
+> *Developed by [@Heritage-XioN](https://github.com/Heritage-XioN)*
 ## What It Does
 
 - Strip metadata from JPEG, PNG, PDF, Word, Excel, and PowerPoint files
