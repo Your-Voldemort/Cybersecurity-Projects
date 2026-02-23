@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      pull-requests: write
       contents: read
 
     strategy:
@@ -198,7 +197,7 @@ jobs:
 
     # Create Summary for Ruff
     - name: Create Ruff Lint Summary
-      if: matrix.type == 'ruff' && github.event_name == 'pull_request'
+      if: matrix.type == 'ruff'
       run: |
         {
           echo "## Lint Results: ${{ matrix.name }}"
@@ -225,13 +224,11 @@ jobs:
             echo '---'
             echo '### Review the issues above'
           fi
-          echo ''
-          echo "<!-- lint-check-${{ matrix.name }}-marker -->"
-        } > lint-report.md
+        } >> $GITHUB_STEP_SUMMARY
 
     # Create Summary for Biome
     - name: Create Biome Lint Summary
-      if: matrix.type == 'biome' && github.event_name == 'pull_request'
+      if: matrix.type == 'biome'
       run: |
         {
           echo "## Lint Results: ${{ matrix.name }}"
@@ -258,13 +255,11 @@ jobs:
             echo '---'
             echo '### Review the issues above'
           fi
-          echo ''
-          echo "<!-- lint-check-${{ matrix.name }}-marker -->"
-        } > lint-report.md
+        } >> $GITHUB_STEP_SUMMARY
 
     # Create Summary for Go
     - name: Create Go Lint Summary
-      if: matrix.type == 'go' && github.event_name == 'pull_request'
+      if: matrix.type == 'go'
       run: |
         {
           echo "## Lint Results: ${{ matrix.name }}"
@@ -291,19 +286,7 @@ jobs:
             echo '---'
             echo '### Review the issues above'
           fi
-          echo ''
-          echo "<!-- lint-check-${{ matrix.name }}-marker -->"
-        } > lint-report.md
-
-    # Post PR Comment
-    - name: Post PR Comment
-      if: github.event_name == 'pull_request'
-      uses: peter-evans/create-or-update-comment@v4
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body-path: ${{ matrix.path }}/lint-report.md
-        edit-mode: replace
-        comment-tag: lint-check-${{ matrix.name }}
+        } >> $GITHUB_STEP_SUMMARY
 
     # Exit with proper status
     - name: Check lint status
