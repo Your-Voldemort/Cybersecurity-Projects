@@ -42,10 +42,10 @@
 class PcapCapture {
   private:
 	/* libpcap error buffer */
-	char errbuf[PCAP_ERRBUF_SIZE];
+	char errbuf[PCAP_ERRBUF_SIZE] = {};
 
 	/* filter expression (compiled before capture) */
-	std::string filter_exp = "";
+	std::string filter_exp;
 	/* compiled filter program (expression) */
 	struct bpf_program fp = {};
 	/* Active pcap handle */
@@ -73,7 +73,7 @@ class PcapCapture {
 	 * we use a static function and forward the call
 	 * to the class instance.
 	 */
-	static void callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
+	static void callback(u_char *user, const struct pcap_pkthdr *header, const u_char *packet);
 	// packet processing logic
 	void got_packet(const struct pcap_pkthdr *header, const u_char *packet);
 
@@ -81,10 +81,16 @@ class PcapCapture {
 	std::thread thread;
 	std::atomic<bool> running{false};
 	void stop();
-	Stats *stats;
+	Stats *stats = nullptr;
 
   public:
+	PcapCapture() = default;
 	~PcapCapture();
+
+	PcapCapture(const PcapCapture &) = delete;
+	PcapCapture &operator=(const PcapCapture &) = delete;
+	PcapCapture(PcapCapture &&) = delete;
+	PcapCapture &operator=(PcapCapture &&) = delete;
 	void print_interfaces();
 
 	bool isRunning() { return running; }

@@ -1,12 +1,14 @@
 ```ruby
-▄▄▄▄▄▄ ▄▄▄▄   ▄▄▄  ▄▄▄▄▄ ▄▄▄▄▄ ▄▄  ▄▄▄▄    ▄▄▄  ▄▄  ▄▄  ▄▄▄  ▄▄  ▄▄ ▄▄ ▄▄▄▄▄ ▄▄▄▄▄ ▄▄▄▄  
-  ██   ██▄█▄ ██▀██ ██▄▄  ██▄▄  ██ ██▀▀▀   ██▀██ ███▄██ ██▀██ ██  ▀███▀   ▄█▀ ██▄▄  ██▄█▄ 
-  ██   ██ ██ ██▀██ ██    ██    ██ ▀████   ██▀██ ██ ▀██ ██▀██ ██▄▄▄ █   ▄██▄▄ ██▄▄▄ ██ ██ 
-                                                                                         
+▄▄▄▄▄▄ ▄▄▄▄   ▄▄▄  ▄▄▄▄▄ ▄▄▄▄▄ ▄▄  ▄▄▄▄    ▄▄▄  ▄▄  ▄▄  ▄▄▄  ▄▄  ▄▄ ▄▄ ▄▄▄▄▄ ▄▄▄▄▄ ▄▄▄▄
+  ██   ██▄█▄ ██▀██ ██▄▄  ██▄▄  ██ ██▀▀▀   ██▀██ ███▄██ ██▀██ ██  ▀███▀   ▄█▀ ██▄▄  ██▄█▄
+  ██   ██ ██ ██▀██ ██    ██    ██ ▀████   ██▀██ ██ ▀██ ██▀██ ██▄▄▄ █   ▄██▄▄ ██▄▄▄ ██ ██
+
 ```
 
 >A high-performance CLI network analyzer built with libpcap for raw packet capture and FTXUI for a fully interactive terminal UI.
 The application captures packets directly from a network interface, parses protocol headers manually, aggregates statistics in real time
+
+*Developed by [@deniskhud](https://github.com/deniskhud)*
 
 ---
 ![Preview](example.png)
@@ -26,9 +28,9 @@ Or grant capabilities:
 sudo setcap cap_net_raw,cap_net_admin=eip ./network-traffic-analyzer
 ```
 
-Or you can use `just` command 
+Or you can use `just` command
 ```
-just run 
+just run
  ```
 ---
 
@@ -50,7 +52,7 @@ just run
 - Offline analysis from .pcap file (-r, --offline)
 - Packet count limit (-c)
 - Time limit for capture (-t)
-- Interface discovery (--interfaces) 
+- Interface discovery (--interfaces)
 
 > [!TIP]
 > For the complete list of CLI options, use:
@@ -63,7 +65,7 @@ just run
 - FTXUI
 - CMake
 
-# Setup 
+# Setup
 ## 1. clone the repo then
 ```bash
 cd network-traffic-analyzer
@@ -88,3 +90,15 @@ just run --offline traffic.pcap
 ```
 just run --json result.json --csv result.csv
 ```
+
+---
+
+## Learn More
+
+| Doc | Contents |
+|-----|----------|
+| [00-OVERVIEW.md](./learn/00-OVERVIEW.md) | Quick start, prerequisites, project structure |
+| [01-CONCEPTS.md](./learn/01-CONCEPTS.md) | libpcap internals, BPF filters, protocol header parsing |
+| [02-ARCHITECTURE.md](./learn/02-ARCHITECTURE.md) | System design, component breakdown, data flow, threading model |
+| [03-IMPLEMENTATION.md](./learn/03-IMPLEMENTATION.md) | Line-by-line code walkthrough |
+| [04-CHALLENGES.md](./learn/04-CHALLENGES.md) | Extension ideas and advanced topics |

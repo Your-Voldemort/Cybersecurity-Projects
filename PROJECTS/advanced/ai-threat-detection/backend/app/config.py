@@ -41,5 +41,13 @@ class Settings(BaseSettings):
     batch_size: int = 32
     batch_timeout_ms: int = 50
 
+    model_dir: str = "data/models"
+    detection_mode: str = "rules"
+    ensemble_weight_ae: float = 0.40
+    ensemble_weight_rf: float = 0.40
+    ensemble_weight_if: float = 0.20
+    ae_threshold_percentile: float = 99.5
+    mlflow_tracking_uri: str = "file:./mlruns"
+
 
 settings = Settings()

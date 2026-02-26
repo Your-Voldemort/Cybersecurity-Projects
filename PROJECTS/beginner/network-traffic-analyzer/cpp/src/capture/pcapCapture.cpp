@@ -16,7 +16,7 @@ void PcapCapture::datalink_type(int type) {
 	case DLT_EN10MB: {
 		offset = 14;
 		get_ether_type = [](const u_char *p) {
-			auto *eth = reinterpret_cast<const ether_header *>(p);
+			const auto *eth = reinterpret_cast<const ether_header *>(p);
 			return ntohs(eth->ether_type);
 		};
 		break;
@@ -89,19 +89,21 @@ void PcapCapture::start() {
 PcapCapture::~PcapCapture() { stop(); }
 void PcapCapture::stop() {
 	pcap_freecode(&fp);
-	if (!handle)
+	if (!handle) {
 		return;
+	}
 
 	running = false;
 
 	pcap_breakloop(handle.get());
 
-	if (thread.joinable())
+	if (thread.joinable()) {
 		thread.join();
+	}
 
 	handle.reset();
 
-	if (interfaces) {
+	if (interfaces != nullptr) {
 		pcap_freealldevs(interfaces);
 		interfaces = nullptr;
 	}
@@ -110,9 +112,9 @@ void PcapCapture::stop() {
 /* print all available interfaces */
 void PcapCapture::print_interfaces() {
 	int i = 0;
-	for (pcap_if_t *dev = interfaces; dev; dev = dev->next) {
+	for (pcap_if_t *dev = interfaces; dev != nullptr; dev = dev->next) {
 		printf("%d. %s  ", ++i, dev->name);
-		if (dev->description) {
+		if (dev->description != nullptr) {
 			printf("(%s)\n", dev->description);
 		} else {
 			printf("\n");
@@ -130,9 +132,10 @@ void PcapCapture::print_interfaces() {
  * @param packet Raw packet bytes
  */
 void PcapCapture::callback(u_char *user, const struct pcap_pkthdr *header, const u_char *packet) {
-	auto *self = reinterpret_cast<PcapCapture *>(user);
-	if (!self->isRunning())
+	auto * const self = reinterpret_cast<PcapCapture *>(user);
+	if (!self->isRunning()) {
 		return;
+	}
 	self->got_packet(header, packet);
 }
 
@@ -150,17 +153,17 @@ void PcapCapture::callback(u_char *user, const struct pcap_pkthdr *header, const
  * Other Ethernet types are ignored.
  */
 void PcapCapture::got_packet(const struct pcap_pkthdr *header, const u_char *packet) {
-	if (!running)
+	if (!running) {
 		return;
+	}
 
 	// --- Ethernet header ---
-	// const auto* ethernet = reinterpret_cast<const ether_header*>(packet + offset);
-	uint16_t ether_type = get_ether_type(packet);
+	const uint16_t ether_type = get_ether_type(packet);
 
 	/* if we have a ipv4 type */
 	if (ether_type == ETHERTYPE_IP) {
 		IPv4 ip(packet + offset);
-		TransportProtocol prot = ip.get_protocol();
+		const TransportProtocol prot = ip.get_protocol();
 
 		Packet packetView(v4, prot, ip.get_source(), ip.get_dest(), ip.get_src_port(), ip.get_dest_port(), header->len,
 						  ip.get_payload_len(), ip.get_payload_ptr());
@@ -170,7 +173,7 @@ void PcapCapture::got_packet(const struct pcap_pkthdr *header, const u_char *pac
 	/* ipv6 type */
 	else if (ether_type == ETHERTYPE_IPV6) {
 		IPv6 ip(packet + offset);
-		TransportProtocol prot = ip.get_protocol();
+		const TransportProtocol prot = ip.get_protocol();
 		Packet packetView(v6, prot, ip.get_source(), ip.get_dest(), ip.get_src_port(), ip.get_dest_port(), header->len,
 						  ip.get_payload_len(), ip.get_payload_ptr());
 		stats->add_packet(packetView);

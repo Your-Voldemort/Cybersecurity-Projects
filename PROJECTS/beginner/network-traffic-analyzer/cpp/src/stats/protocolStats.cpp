@@ -203,20 +203,6 @@ void Stats::update_packets() {
 	}
 }
 
-double Stats::smooth_value(size_t i, size_t start) {
-	const int window = 3;
-	double sum = 0.0;
-	int count = 0;
-
-	for (int k = -window; k <= window; ++k) {
-		long idx = (long)i + k;
-		if (idx >= (long)start && idx < (long)snapshot.bandwidth_history.size()) {
-			sum += snapshot.bandwidth_history[idx].bytes_per_sec;
-			count++;
-		}
-	}
-	return count ? sum / count : 0.0;
-}
 /**
  * @brief Calculates current bandwidth (bytes/sec).
  *

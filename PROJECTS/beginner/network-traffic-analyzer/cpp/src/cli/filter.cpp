@@ -3,25 +3,30 @@
 #include <stdexcept>
 
 filter parse(const std::string &str) {
-	auto pos = str.find(':');
+	const auto pos = str.find(':');
 	if (pos == std::string::npos) {
 		throw std::invalid_argument("Invalid filter format: '" + str + "' (expected key:value)");
 	}
 
-	std::string type = str.substr(0, pos);
-	std::string value = str.substr(pos + 1);
+	const std::string type = str.substr(0, pos);
+	const std::string value = str.substr(pos + 1);
 
-	if (type == "protocol")
-		return {PROTOCOL, value};
-	if (type == "port")
-		return {PORT, value};
-	if (type == "dest")
-		return {IP_DEST, value};
-	if (type == "src")
-		return {IP_SRC, value};
-	if (type == "ip")
-		return {IP_TYPE, value};
-	return {NONE, value};
+	if (type == "protocol") {
+		return {.type = PROTOCOL, .val = value};
+	}
+	if (type == "port") {
+		return {.type = PORT, .val = value};
+	}
+	if (type == "dest") {
+		return {.type = IP_DEST, .val = value};
+	}
+	if (type == "src") {
+		return {.type = IP_SRC, .val = value};
+	}
+	if (type == "ip") {
+		return {.type = IP_TYPE, .val = value};
+	}
+	return {.type = NONE, .val = value};
 }
 
 std::string get_bpf_filter(const std::vector<filter> &f) {
@@ -30,20 +35,21 @@ std::string get_bpf_filter(const std::vector<filter> &f) {
 	for (const auto &x : f) {
 		switch (x.type) {
 		case PROTOCOL:
-			if (x.val == "dns")
+			if (x.val == "dns") {
 				groups[PROTOCOL].emplace_back("port 53");
-			else if (x.val == "http")
+			} else if (x.val == "http") {
 				groups[PROTOCOL].emplace_back("port 80");
-			else if (x.val == "https")
+			} else if (x.val == "https") {
 				groups[PROTOCOL].emplace_back("port 443");
-			else if (x.val == "ssh")
+			} else if (x.val == "ssh") {
 				groups[PROTOCOL].emplace_back("port 22");
-			else if (x.val == "ftp")
+			} else if (x.val == "ftp") {
 				groups[PROTOCOL].emplace_back("port 21");
-			else if (x.val == "smtp")
+			} else if (x.val == "smtp") {
 				groups[PROTOCOL].emplace_back("port 25");
-			else
+			} else {
 				groups[PROTOCOL].push_back(x.val);
+			}
 			break;
 
 		case IP_DEST:
@@ -58,12 +64,13 @@ std::string get_bpf_filter(const std::vector<filter> &f) {
 			groups[PORT].push_back("port " + x.val);
 			break;
 		case IP_TYPE: {
-			if (x.val == "v4" || x.val == "4" || x.val == "ipv4")
+			if (x.val == "v4" || x.val == "4" || x.val == "ipv4") {
 				groups[IP_TYPE].emplace_back("ip");
-			else if (x.val == "v6" || x.val == "6" || x.val == "ipv6")
+			} else if (x.val == "v6" || x.val == "6" || x.val == "ipv6") {
 				groups[IP_TYPE].emplace_back("ip6");
-			else
+			} else {
 				throw std::invalid_argument("Unknown IP type: '" + x.val + "'");
+			}
 			break;
 		}
 
@@ -76,21 +83,25 @@ std::string get_bpf_filter(const std::vector<filter> &f) {
 	bool first_group = true;
 
 	for (auto &[type, parts] : groups) {
-		if (!first_group)
+		if (!first_group) {
 			result += " and ";
+		}
 		first_group = false;
 
-		if (parts.size() > 1)
+		if (parts.size() > 1) {
 			result += "(";
+		}
 
 		for (size_t i = 0; i < parts.size(); ++i) {
 			result += parts[i];
-			if (i + 1 < parts.size())
+			if (i + 1 < parts.size()) {
 				result += " or ";
+			}
 		}
 
-		if (parts.size() > 1)
+		if (parts.size() > 1) {
 			result += ")";
+		}
 	}
 
 	return result;

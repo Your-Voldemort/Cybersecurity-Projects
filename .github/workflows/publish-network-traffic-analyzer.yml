@@ -10,9 +10,9 @@ on:
     branches:
       - main
     paths:
-      - 'PROJECTS/beginner/network-traffic-analyzer/**'
-      - '!PROJECTS/beginner/network-traffic-analyzer/README.md'
-      - '!PROJECTS/beginner/network-traffic-analyzer/justfile'
+      - 'PROJECTS/beginner/network-traffic-analyzer/python/**'
+      - '!PROJECTS/beginner/network-traffic-analyzer/python/README.md'
+      - '!PROJECTS/beginner/network-traffic-analyzer/python/justfile'
 
 permissions:
   contents: read
@@ -37,7 +37,7 @@ jobs:
 
       - name: Check if version exists on PyPI
         id: version_check
-        working-directory: PROJECTS/beginner/network-traffic-analyzer
+        working-directory: PROJECTS/beginner/network-traffic-analyzer/python
         run: |
           VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/netanal/${VERSION}/json")
@@ -57,11 +57,11 @@ jobs:
 
       - name: Build package
         if: steps.version_check.outputs.exists != 'true'
-        working-directory: PROJECTS/beginner/network-traffic-analyzer
+        working-directory: PROJECTS/beginner/network-traffic-analyzer/python
         run: python -m build
 
       - name: Publish to PyPI
         if: steps.version_check.outputs.exists != 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: PROJECTS/beginner/network-traffic-analyzer/dist/
+          packages-dir: PROJECTS/beginner/network-traffic-analyzer/python/dist/

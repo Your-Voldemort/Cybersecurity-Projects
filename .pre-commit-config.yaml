@@ -31,7 +31,7 @@ repos:
       - id: ruff
         name: ruff check (network-traffic-analyzer)
         args: [--fix, --exit-non-zero-on-fix]
-        files: ^PROJECTS/beginner/network-traffic-analyzer/
+        files: ^PROJECTS/beginner/network-traffic-analyzer/python/
         exclude: (\.venv|__pycache__|\.pytest_cache)/
 
       - id: ruff

@@ -137,33 +137,34 @@ ftxui::Element View::render_pairs(const StatsSnapshot &data) {
 
 ftxui::Element View::render_bandwidth(const StatsSnapshot &data) {
 
-	GraphFunction fn = [this, data](int width, int height) {
+	GraphFunction fn = [data](int width, int height) {
 		std::vector<int> output(width, 0);
 
-		if (data.bandwidth_history.size() < 2)
+		if (data.bandwidth_history.size() < 2) {
 			return output;
+		}
 
-		size_t n = data.bandwidth_history.size();
-		size_t start = n > 50 ? n - 50 : 0;
+		const size_t n = data.bandwidth_history.size();
+		const size_t start = n > 50 ? n - 50 : 0;
 
 		double max_bw = 1.0;
-		for (size_t i = start; i < n; ++i)
+		for (size_t i = start; i < n; ++i) {
 			max_bw = std::max(max_bw, data.bandwidth_history[i].bytes_per_sec);
+		}
 
 		for (int x = 0; x < width; ++x) {
+			const double t = static_cast<double>(x) / static_cast<double>(width - 1);
 
-			double t = (double)x / (width - 1);
+			const double idx_f = static_cast<double>(start) + t * static_cast<double>(n - start - 1);
+			const size_t i0 = static_cast<size_t>(idx_f);
+			const size_t i1 = std::min(i0 + 1, n - 1);
 
-			double idx_f = start + t * (n - start - 1);
-			size_t i0 = (size_t)idx_f;
-			size_t i1 = std::min(i0 + 1, n - 1);
+			const double frac = idx_f - static_cast<double>(i0);
+			const double bw = data.bandwidth_history[i0].bytes_per_sec * (1.0 - frac) +
+			                  data.bandwidth_history[i1].bytes_per_sec * frac;
 
-			double frac = idx_f - i0;
-			double bw = data.bandwidth_history[i0].bytes_per_sec * (1.0 - frac) +
-						data.bandwidth_history[i1].bytes_per_sec * frac;
-
-			double v = bw / max_bw;
-			output[x] = static_cast<int>(v * (height - 1));
+			const double v = bw / max_bw;
+			output[x] = static_cast<int>(v * static_cast<double>(height - 1));
 		}
 
 		return output;

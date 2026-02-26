@@ -15,13 +15,16 @@ std::string IP_class::get_source() { return src; }
 std::string IP_class::get_dest() { return dst; }
 
 /*** Ipv4 ***/
-IPv4::IPv4(const u_char *data) {
-	ip_hdr = reinterpret_cast<const ip *>(data);
+IPv4::IPv4(const u_char *data)
+    : ip_hdr(reinterpret_cast<const ip *>(data)),
+      ip_hdr_len(static_cast<int>(ip_hdr->ip_hl) * 4) {
+	std::array<char, INET_ADDRSTRLEN> src_buf{};
+	inet_ntop(AF_INET, &ip_hdr->ip_src, src_buf.data(), sizeof(src_buf));
+	src = src_buf.data();
 
-	src = inet_ntoa(ip_hdr->ip_src);
-	dst = inet_ntoa(ip_hdr->ip_dst);
-
-	ip_hdr_len = ip_hdr->ip_hl * 4;
+	std::array<char, INET_ADDRSTRLEN> dst_buf{};
+	inet_ntop(AF_INET, &ip_hdr->ip_dst, dst_buf.data(), sizeof(dst_buf));
+	dst = dst_buf.data();
 	if (ip_hdr_len < 20) {
 		throw std::runtime_error("Failed to initial IPv4 ");
 	}
@@ -55,8 +58,9 @@ void IPv4::handle_tcp() {
 	src_port = ntohs(tcp->source);
 	dest_port = ntohs(tcp->dest);
 
-	payload_ptr = reinterpret_cast<const u_char *>(tcp) + tcp->doff * 4;
-	payload_len = ntohs(ip_hdr->ip_len) - (ip_hdr_len + tcp->doff * 4);
+	const auto tcp_hdr_len = static_cast<std::size_t>(tcp->doff) * 4U;
+	payload_ptr = reinterpret_cast<const u_char *>(tcp) + tcp_hdr_len;
+	payload_len = static_cast<uint16_t>(ntohs(ip_hdr->ip_len) - ip_hdr_len - static_cast<int>(tcp_hdr_len));
 
 	protocol = TransportProtocol::TCP;
 }
@@ -79,8 +83,9 @@ uint16_t IPv4::get_dest_port() { return dest_port; }
 
 /*** Ipv6 ***/
 
-IPv6::IPv6(const u_char *data) {
-	ip_hdr = reinterpret_cast<const ip6_hdr *>(data);
+IPv6::IPv6(const u_char *data)
+    : ip_hdr(reinterpret_cast<const ip6_hdr *>(data)),
+      ptr(reinterpret_cast<const uint8_t *>(ip_hdr + 1)) {
 	uint8_t hdr = ip_hdr->ip6_nxt;
 	std::array<char, INET6_ADDRSTRLEN> src{};
 	inet_ntop(AF_INET6, &ip_hdr->ip6_src, src.data(), sizeof(src));
@@ -89,8 +94,6 @@ IPv6::IPv6(const u_char *data) {
 	std::array<char, INET6_ADDRSTRLEN> dst{};
 	inet_ntop(AF_INET6, &ip_hdr->ip6_dst, dst.data(), sizeof(dst));
 	this->dst = dst.data();
-
-	ptr = reinterpret_cast<const uint8_t *>(ip_hdr + 1);
 	while (true) {
 		switch (hdr) {
 		case IPPROTO_TCP:
@@ -117,7 +120,7 @@ IPv6::IPv6(const u_char *data) {
 		case IPPROTO_DSTOPTS: {
 			const auto *ext = reinterpret_cast<const ip6_ext *>(ptr);
 			hdr = ext->ip6e_nxt;
-			ptr += (ext->ip6e_len + 1) * 8;
+			ptr += (static_cast<std::size_t>(ext->ip6e_len) + 1U) * 8U;
 			break;
 		}
 		case IPPROTO_FRAGMENT: {
@@ -136,18 +139,19 @@ IPv6::IPv6(const u_char *data) {
 }
 
 void IPv6::handle_tcp() {
-	const auto tcp = reinterpret_cast<const tcphdr *>(ptr);
+	const auto *const tcp = reinterpret_cast<const tcphdr *>(ptr);
 	dest_port = ntohs(tcp->dest);
 	src_port = ntohs(tcp->source);
 
-	payload_ptr = reinterpret_cast<const uint8_t *>(tcp) + tcp->doff * 4;
-	payload_len = ntohs(ip_hdr->ip6_plen) - tcp->doff * 4;
+	const auto tcp_hdr_len = static_cast<std::size_t>(tcp->doff) * 4U;
+	payload_ptr = reinterpret_cast<const uint8_t *>(tcp) + tcp_hdr_len;
+	payload_len = static_cast<uint16_t>(ntohs(ip_hdr->ip6_plen) - static_cast<uint16_t>(tcp_hdr_len));
 
 	protocol = TransportProtocol::TCP;
 	ptr = nullptr;
 }
 void IPv6::handle_udp() {
-	const auto udp = reinterpret_cast<const udphdr *>(ptr);
+	const auto *const udp = reinterpret_cast<const udphdr *>(ptr);
 	dest_port = ntohs(udp->dest);
 	src_port = ntohs(udp->source);
 

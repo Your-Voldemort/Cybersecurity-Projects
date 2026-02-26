@@ -21,7 +21,7 @@ interfaces:
 
 lint:
     @sed -i 's/-fdeps-format=p1689r5//g; s/-fmodule-mapper=[^ ]*//g; s/-fmodules-ts//g' build/release/compile_commands.json
-    clang-tidy -p build/release src/**/*.cpp
+    clang-tidy -p build/release src/**/*.cpp 2>/dev/null
 
 format:
     find src include \( -name '*.cpp' -o -name '*.hpp' \) | xargs clang-format -i

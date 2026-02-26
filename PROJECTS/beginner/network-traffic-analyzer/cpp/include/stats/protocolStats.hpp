@@ -91,7 +91,6 @@ class Stats {
 		return snapshot;
 	}
 	void update_bandwidth();
-	double smooth_value(size_t i, size_t start);
 	double smooth_bandwidth = 0.0;
 
 	void set_packets_limit(int limit) { limit_packets = limit; }

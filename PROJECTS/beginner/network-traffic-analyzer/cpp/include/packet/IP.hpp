@@ -72,11 +72,11 @@ class IPv6 : public IP_class {
 	const ip6_hdr *ip_hdr = nullptr;
 	int ip_hdr_len = 40;
 
-	in6_addr ip_source;
-	in6_addr ip_dest;
+	in6_addr ip_source = {};
+	in6_addr ip_dest = {};
 
-	uint16_t src_port;
-	uint16_t dest_port;
+	uint16_t src_port = 0;
+	uint16_t dest_port = 0;
 
 	const uint8_t *ptr = nullptr;
 

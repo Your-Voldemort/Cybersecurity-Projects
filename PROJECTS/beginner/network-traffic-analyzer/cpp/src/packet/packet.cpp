@@ -2,25 +2,28 @@
 #include <cstring>
 
 ApplicationProtocol Packet::get_application_protocol() {
-	if (!payload_ptr || payload_len < 4)
-		goto check_port;
+	if (payload_ptr != nullptr && payload_len >= 4) {
+		if (transport_protocol == TransportProtocol::TCP) {
+			if (memcmp(payload_ptr, "GET ", 4) == 0 || memcmp(payload_ptr, "POST", 4) == 0 ||
+				memcmp(payload_ptr, "HEAD", 4) == 0 || memcmp(payload_ptr, "PUT ", 4) == 0 ||
+				memcmp(payload_ptr, "HTTP", 4) == 0) {
+				return ApplicationProtocol::HTTP;
+			}
+		}
 
-	if (transport_protocol == TransportProtocol::TCP) {
-		if (!memcmp(payload_ptr, "GET ", 4) || !memcmp(payload_ptr, "POST", 4) || !memcmp(payload_ptr, "HEAD", 4) ||
-			!memcmp(payload_ptr, "PUT ", 4) || !memcmp(payload_ptr, "HTTP", 4))
-			return ApplicationProtocol::HTTP;
+		if ((src_port == 53 || dst_port == 53) && payload_len >= 12) {
+			return ApplicationProtocol::DNS;
+		}
+
+		if (transport_protocol == TransportProtocol::TCP && payload_len >= 3) {
+			if (payload_ptr[0] == 0x16 && payload_ptr[1] == 0x03) {
+				return ApplicationProtocol::HTTPS;
+			}
+		}
 	}
 
-	if ((src_port == 53 || dst_port == 53) && payload_len >= 12) {
-		return ApplicationProtocol::DNS;
-	}
-	if (transport_protocol == TransportProtocol::TCP && payload_len >= 3) {
-		if (payload_ptr[0] == 0x16 && payload_ptr[1] == 0x03)
-			return ApplicationProtocol::HTTPS;
-	}
+	const uint16_t port = (src_port < dst_port) ? src_port : dst_port;
 
-check_port:
-	uint16_t port = (src_port < dst_port) ? src_port : dst_port;
 	if (transport_protocol == TransportProtocol::TCP) {
 		switch (port) {
 		case 21:

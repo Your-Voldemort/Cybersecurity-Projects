@@ -35,7 +35,7 @@ jobs:
             path: PROJECTS/beginner/metadata-scrubber-tool
           - name: network-traffic-analyzer
             type: ruff
-            path: PROJECTS/beginner/network-traffic-analyzer
+            path: PROJECTS/beginner/network-traffic-analyzer/python
           - name: base64-tool
             type: ruff
             path: PROJECTS/beginner/base64-tool
