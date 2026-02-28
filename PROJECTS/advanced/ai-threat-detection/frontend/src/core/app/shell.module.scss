@@ -299,6 +299,8 @@ $header-height: 56px;
 .content {
   flex: 1;
   overflow-y: auto;
+  background-image: radial-gradient(circle, $border-muted 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 .loading {
