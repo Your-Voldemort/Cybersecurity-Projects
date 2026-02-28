@@ -71,4 +71,4 @@ class ThreatAutoencoder(nn.Module):
         Per-sample mean squared error between input and reconstruction.
         """
         reconstructed = self.forward(x)
-        return torch.mean((x - reconstructed) ** 2, dim=1)
+        return torch.mean((x - reconstructed)**2, dim=1)

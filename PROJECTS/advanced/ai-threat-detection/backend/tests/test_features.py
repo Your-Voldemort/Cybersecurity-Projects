@@ -1,6 +1,8 @@
 """
 ©AngelaMos | 2026
 test_features.py
+
+Tests per-request feature extraction, Redis sliding-window aggregation, and feature encoding.
 """
 
 from datetime import datetime, UTC
@@ -79,16 +81,20 @@ def test_path_depth() -> None:
     Path depth counts non-empty segments between slashes.
     """
     assert extract_request_features(_make_entry(path="/"))["path_depth"] == 0
-    assert extract_request_features(_make_entry(path="/api"))["path_depth"] == 1
-    assert extract_request_features(_make_entry(path="/api/v1/users"))["path_depth"] == 3
+    assert extract_request_features(
+        _make_entry(path="/api"))["path_depth"] == 1
+    assert extract_request_features(
+        _make_entry(path="/api/v1/users"))["path_depth"] == 3
 
 
 def test_path_entropy_high_vs_low() -> None:
     """
     Random-character paths have higher entropy than simple paths.
     """
-    low = extract_request_features(_make_entry(path="/index.html"))["path_entropy"]
-    high = extract_request_features(_make_entry(path="/x8Kp2mQz7wR4vL1n"))["path_entropy"]
+    low = extract_request_features(
+        _make_entry(path="/index.html"))["path_entropy"]
+    high = extract_request_features(
+        _make_entry(path="/x8Kp2mQz7wR4vL1n"))["path_entropy"]
     assert high > low
 
 
@@ -96,7 +102,8 @@ def test_query_string_features() -> None:
     """
     Query param count and length are extracted correctly.
     """
-    features = extract_request_features(_make_entry(query_string="page=1&sort=name&limit=50"))
+    features = extract_request_features(
+        _make_entry(query_string="page=1&sort=name&limit=50"))
     assert features["query_param_count"] == 3
     assert features["query_string_length"] == len("page=1&sort=name&limit=50")
 
@@ -110,11 +117,11 @@ def test_url_encoding_detection() -> None:
     Percent-encoded sequences are detected in path and query.
     """
     encoded = extract_request_features(
-        _make_entry(path="/search", query_string="q=%27OR+1%3D1")
-    )
+        _make_entry(path="/search", query_string="q=%27OR+1%3D1"))
     assert encoded["has_encoded_chars"] is True
 
-    clean = extract_request_features(_make_entry(path="/index.html", query_string=""))
+    clean = extract_request_features(
+        _make_entry(path="/index.html", query_string=""))
     assert clean["has_encoded_chars"] is False
 
 
@@ -133,9 +140,12 @@ def test_status_class() -> None:
     """
     Status class groups status codes into Nxx buckets.
     """
-    assert extract_request_features(_make_entry(status_code=200))["status_class"] == "2xx"
-    assert extract_request_features(_make_entry(status_code=404))["status_class"] == "4xx"
-    assert extract_request_features(_make_entry(status_code=503))["status_class"] == "5xx"
+    assert extract_request_features(
+        _make_entry(status_code=200))["status_class"] == "2xx"
+    assert extract_request_features(
+        _make_entry(status_code=404))["status_class"] == "4xx"
+    assert extract_request_features(
+        _make_entry(status_code=503))["status_class"] == "5xx"
 
 
 def test_temporal_features() -> None:
@@ -161,14 +171,13 @@ def test_ua_bot_detection() -> None:
     """
     bot = extract_request_features(
         _make_entry(
-            user_agent="Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-        )
-    )
+            user_agent=
+            "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+        ))
     assert bot["is_known_bot"] is True
 
     normal = extract_request_features(
-        _make_entry(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-    )
+        _make_entry(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)"))
     assert normal["is_known_bot"] is False
 
 
@@ -176,7 +185,8 @@ def test_ua_scanner_detection() -> None:
     """
     Known vulnerability scanner user agents are flagged.
     """
-    nikto = extract_request_features(_make_entry(user_agent="Mozilla/5.00 (Nikto/2.1.6)"))
+    nikto = extract_request_features(
+        _make_entry(user_agent="Mozilla/5.00 (Nikto/2.1.6)"))
     assert nikto["is_known_scanner"] is True
 
     sqlmap = extract_request_features(_make_entry(user_agent="sqlmap/1.8"))
@@ -187,15 +197,17 @@ def test_attack_pattern_detection() -> None:
     """
     SQLi, XSS, and path traversal patterns in paths are detected.
     """
-    sqli = extract_request_features(_make_entry(path="/users", query_string="id=1' OR 1=1--"))
+    sqli = extract_request_features(
+        _make_entry(path="/users", query_string="id=1' OR 1=1--"))
     assert sqli["has_attack_pattern"] is True
 
     xss = extract_request_features(
-        _make_entry(path="/comment", query_string="body=<script>alert(1)</script>")
-    )
+        _make_entry(path="/comment",
+                    query_string="body=<script>alert(1)</script>"))
     assert xss["has_attack_pattern"] is True
 
-    traversal = extract_request_features(_make_entry(path="/static/../../etc/passwd"))
+    traversal = extract_request_features(
+        _make_entry(path="/static/../../etc/passwd"))
     assert traversal["has_attack_pattern"] is True
 
     clean = extract_request_features(_make_entry(path="/api/v1/health"))
@@ -206,11 +218,12 @@ def test_special_char_ratio() -> None:
     """
     Paths with many non-alphanumeric characters have higher ratios.
     """
-    clean = extract_request_features(_make_entry(path="/api/users"))["special_char_ratio"]
+    clean = extract_request_features(
+        _make_entry(path="/api/users"))["special_char_ratio"]
 
-    noisy = extract_request_features(_make_entry(path="/<script>alert('xss')</script>"))[
-        "special_char_ratio"
-    ]
+    noisy = extract_request_features(
+        _make_entry(
+            path="/<script>alert('xss')</script>"))["special_char_ratio"]
 
     assert noisy > clean
 
@@ -219,20 +232,25 @@ def test_private_ip_detection() -> None:
     """
     RFC 1918 and loopback addresses are classified as private.
     """
-    assert extract_request_features(_make_entry(ip="192.168.1.1"))["is_private_ip"] is True
+    assert extract_request_features(
+        _make_entry(ip="192.168.1.1"))["is_private_ip"] is True
 
-    assert extract_request_features(_make_entry(ip="127.0.0.1"))["is_private_ip"] is True
+    assert extract_request_features(
+        _make_entry(ip="127.0.0.1"))["is_private_ip"] is True
 
-    assert extract_request_features(_make_entry(ip="8.8.8.8"))["is_private_ip"] is False
+    assert extract_request_features(
+        _make_entry(ip="8.8.8.8"))["is_private_ip"] is False
 
 
 def test_file_extension() -> None:
     """
     File extension is extracted from the path.
     """
-    assert extract_request_features(_make_entry(path="/style.css"))["file_extension"] == ".css"
+    assert extract_request_features(
+        _make_entry(path="/style.css"))["file_extension"] == ".css"
 
-    assert extract_request_features(_make_entry(path="/api/users"))["file_extension"] == ""
+    assert extract_request_features(
+        _make_entry(path="/api/users"))["file_extension"] == ""
 
 
 def test_country_code_passthrough() -> None:

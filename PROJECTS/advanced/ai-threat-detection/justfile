@@ -24,20 +24,19 @@ default:
 
 [group('lint')]
 ruff *ARGS:
-    cd backend && uv run ruff check app/ cli/ {{ARGS}}
+    cd backend && uv run ruff check app/ cli/ ml/ tests/ {{ARGS}}
 
 [group('lint')]
 ruff-fix:
-    cd backend && uv run ruff check app/ cli/ --fix
-    cd backend && uv run ruff format app/ cli/
+    cd backend && uv run ruff check app/ cli/ ml/ tests/ --fix
 
 [group('lint')]
-ruff-format:
-    cd backend && uv run ruff format app/ cli/
+yapf *ARGS:
+    cd backend && uv run yapf -rip app/ cli/ ml/ tests/ {{ARGS}}
 
 [group('lint')]
 pylint *ARGS:
-    cd backend && uv run pylint app {{ARGS}}
+    cd backend && uv run pylint app cli ml {{ARGS}}
 
 [group('lint')]
 lint: ruff pylint
@@ -48,7 +47,7 @@ lint: ruff pylint
 
 [group('types')]
 mypy *ARGS:
-    cd backend && uv run mypy app/ cli/ {{ARGS}}
+    cd backend && uv run mypy app/ cli/ ml/ {{ARGS}}
 
 [group('types')]
 typecheck: mypy
@@ -65,8 +64,12 @@ pytest *ARGS:
 test: pytest
 
 [group('test')]
+test-v *ARGS:
+    cd backend && uv run pytest tests/ -v {{ARGS}}
+
+[group('test')]
 test-cov:
-    cd backend && uv run pytest tests/ --cov=app --cov-report=term-missing --cov-report=html
+    cd backend && uv run pytest tests/ --cov=app --cov=cli --cov=ml --cov-report=term-missing --cov-report=html
 
 # =============================================================================
 # CI / Quality
@@ -222,6 +225,18 @@ vigil-config:
 vigil-health:
     curl -sf http://localhost:8000/health | python -m json.tool
 
+[group('vigil')]
+vigil-train *ARGS:
+    cd backend && uv run vigil train {{ARGS}}
+
+[group('vigil')]
+vigil-replay *ARGS:
+    cd backend && uv run vigil replay {{ARGS}}
+
+[group('vigil')]
+vigil-status:
+    curl -sf http://localhost:8000/models/status | python -m json.tool
+
 # =============================================================================
 # Setup
 # =============================================================================
@@ -233,8 +248,8 @@ setup: setup-backend env
 [group('setup')]
 setup-backend:
     @echo "Setting up backend..."
-    cd backend && uv sync
-    @echo "Backend setup complete!"
+    cd backend && uv sync --all-groups
+    @echo "Backend setup complete (with dev + ml deps)!"
 
 [group('setup')]
 env:

@@ -9,6 +9,7 @@ from datetime import datetime
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.detection.ensemble import classify_severity
 from app.core.ingestion.pipeline import ScoredRequest
 from app.models.threat_event import ThreatEvent
 from app.schemas.threats import (
@@ -63,19 +64,28 @@ async def get_threats(
     count_query = select(func.count()).select_from(ThreatEvent)
 
     if severity:
-        query = query.where(ThreatEvent.severity == severity.upper())  # type: ignore[arg-type]
-        count_query = count_query.where(ThreatEvent.severity == severity.upper())  # type: ignore[arg-type]
+        query = query.where(
+            ThreatEvent.severity == severity.upper())  # type: ignore[arg-type]
+        count_query = count_query.where(
+            ThreatEvent.severity == severity.upper())  # type: ignore[arg-type]
     if source_ip:
-        query = query.where(ThreatEvent.source_ip == source_ip)  # type: ignore[arg-type]
-        count_query = count_query.where(ThreatEvent.source_ip == source_ip)  # type: ignore[arg-type]
+        query = query.where(
+            ThreatEvent.source_ip == source_ip)  # type: ignore[arg-type]
+        count_query = count_query.where(
+            ThreatEvent.source_ip == source_ip)  # type: ignore[arg-type]
     if since:
-        query = query.where(ThreatEvent.created_at >= since)  # type: ignore[arg-type]
-        count_query = count_query.where(ThreatEvent.created_at >= since)  # type: ignore[arg-type]
+        query = query.where(ThreatEvent.created_at
+                            >= since)  # type: ignore[arg-type]
+        count_query = count_query.where(ThreatEvent.created_at
+                                        >= since)  # type: ignore[arg-type]
     if until:
-        query = query.where(ThreatEvent.created_at <= until)  # type: ignore[arg-type]
-        count_query = count_query.where(ThreatEvent.created_at <= until)  # type: ignore[arg-type]
+        query = query.where(ThreatEvent.created_at
+                            <= until)  # type: ignore[arg-type]
+        count_query = count_query.where(ThreatEvent.created_at
+                                        <= until)  # type: ignore[arg-type]
 
-    query = query.order_by(ThreatEvent.created_at.desc())  # type: ignore[attr-defined]
+    query = query.order_by(
+        ThreatEvent.created_at.desc())  # type: ignore[attr-defined]
     query = query.offset(offset).limit(limit)
 
     total = (await session.execute(count_query)).scalar_one()
@@ -116,16 +126,16 @@ async def create_threat_event(
         status_code=scored.entry.status_code,
         response_size=scored.entry.response_size,
         user_agent=scored.entry.user_agent,
-        threat_score=scored.rule_result.threat_score,
-        severity=scored.rule_result.severity,
+        threat_score=scored.final_score,
+        severity=classify_severity(scored.final_score),
         component_scores=scored.rule_result.component_scores,
-        geo_country=scored.geo.country if scored.geo else None,
-        geo_city=scored.geo.city if scored.geo else None,
-        geo_lat=scored.geo.lat if scored.geo else None,
-        geo_lon=scored.geo.lon if scored.geo else None,
+        geo_country=(scored.geo.country if scored.geo else None),
+        geo_city=(scored.geo.city if scored.geo else None),
+        geo_lat=(scored.geo.lat if scored.geo else None),
+        geo_lon=(scored.geo.lon if scored.geo else None),
         feature_vector=scored.feature_vector,
-        matched_rules=scored.rule_result.matched_rules or None,
-        model_version="rules-v1",
+        matched_rules=(scored.rule_result.matched_rules or None),
+        model_version=scored.detection_mode,
     )
     session.add(event)
     await session.flush()

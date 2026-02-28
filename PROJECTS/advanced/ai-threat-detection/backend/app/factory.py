@@ -59,11 +59,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         session_factory=app.state.session_factory,
     )
 
+    inference_engine = _load_inference_engine()
+    app.state.models_loaded = inference_engine is not None and inference_engine.is_loaded
+    app.state.detection_mode = "hybrid" if app.state.models_loaded else "rules"
+
     pipeline = Pipeline(
         redis_client=redis_client,  # type: ignore[arg-type]
         rule_engine=RuleEngine(),
         geoip=geoip,
         on_result=dispatcher.dispatch,
+        inference_engine=inference_engine,
+        ensemble_weights={
+            "ae": settings.ensemble_weight_ae,
+            "rf": settings.ensemble_weight_rf,
+            "if": settings.ensemble_weight_if,
+        },
         raw_queue_size=settings.raw_queue_size,
         parsed_queue_size=settings.parsed_queue_size,
         feature_queue_size=settings.feature_queue_size,
@@ -98,6 +108,34 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await engine.dispose()
 
     logger.info("AngelusVigil shut down cleanly")
+
+
+def _load_inference_engine() -> object | None:
+    """
+    Attempt to load the ONNX inference engine from the
+    configured model directory, returning None if ML
+    dependencies are missing or no models are found
+    """
+    try:
+        from app.core.detection.inference import (
+            InferenceEngine, )
+    except ImportError:
+        logger.info("onnxruntime not installed — running in rules-only mode")
+        return None
+
+    engine = InferenceEngine(model_dir=settings.model_dir)
+    if engine.is_loaded:
+        logger.info(
+            "ML models loaded from %s",
+            settings.model_dir,
+        )
+        return engine
+
+    logger.info(
+        "No ML models found in %s — running in rules-only mode",
+        settings.model_dir,
+    )
+    return None
 
 
 def create_app() -> FastAPI:

@@ -1,6 +1,8 @@
 """
 ©AngelaMos | 2026
 conftest.py
+
+Shared pytest fixtures for in-memory SQLite database and HTTPX test client setup.
 """
 
 from collections.abc import AsyncIterator
@@ -84,5 +86,6 @@ async def db_client(db_engine) -> AsyncIterator[AsyncClient]:
     test_app.dependency_overrides[get_session] = override_get_session
 
     transport = ASGITransport(app=test_app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(transport=transport,
+                           base_url="http://test") as client:
         yield client

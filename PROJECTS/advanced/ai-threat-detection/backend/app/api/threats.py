@@ -18,13 +18,13 @@ router = APIRouter(prefix="/threats", tags=["threats"])
 
 @router.get("", response_model=ThreatListResponse)
 async def list_threats(
-    session: AsyncSession = Depends(get_session),
-    limit: int = Query(50, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-    severity: str | None = Query(None),
-    source_ip: str | None = Query(None),
-    since: datetime | None = Query(None),
-    until: datetime | None = Query(None),
+        session: AsyncSession = Depends(get_session),
+        limit: int = Query(50, ge=1, le=100),
+        offset: int = Query(0, ge=0),
+        severity: str | None = Query(None),
+        source_ip: str | None = Query(None),
+        since: datetime | None = Query(None),
+        until: datetime | None = Query(None),
 ) -> ThreatListResponse:
     """
     List threat events with optional filters and pagination.
@@ -42,8 +42,8 @@ async def list_threats(
 
 @router.get("/{threat_id}", response_model=ThreatEventResponse)
 async def get_threat(
-    threat_id: uuid.UUID,
-    session: AsyncSession = Depends(get_session),
+        threat_id: uuid.UUID,
+        session: AsyncSession = Depends(get_session),
 ) -> ThreatEventResponse:
     """
     Fetch a single threat event by ID.

@@ -1,6 +1,8 @@
 """
 ©AngelaMos | 2026
 test_integration.py
+
+End-to-end tests covering the full path from log file write through tailer, pipeline, and database storage.
 """
 
 import asyncio
@@ -22,29 +24,22 @@ from app.core.ingestion.pipeline import Pipeline
 from app.core.ingestion.tailer import LogTailer
 from app.models.threat_event import ThreatEvent
 
-NORMAL_LINE = (
-    "192.168.1.100 - - [11/Feb/2026:10:00:00 +0000] "
-    '"GET /index.html HTTP/1.1" 200 4523 "-" '
-    '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"'
-)
+NORMAL_LINE = ("192.168.1.100 - - [11/Feb/2026:10:00:00 +0000] "
+               '"GET /index.html HTTP/1.1" 200 4523 "-" '
+               '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"')
 
-SQLI_LINE = (
-    "198.51.100.10 - - [11/Feb/2026:10:00:01 +0000] "
-    '"GET /search?q=1%27+OR+1=1-- HTTP/1.1" 200 5678 "-" '
-    '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"'
-)
+SQLI_LINE = ("198.51.100.10 - - [11/Feb/2026:10:00:01 +0000] "
+             '"GET /search?q=1%27+OR+1=1-- HTTP/1.1" 200 5678 "-" '
+             '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"')
 
 XSS_LINE = (
     "198.51.100.11 - - [11/Feb/2026:10:00:02 +0000] "
     '"GET /comment?text=<script>alert(1)</script> HTTP/1.1" 200 3210 "-" '
-    '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"'
-)
+    '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"')
 
-PATH_TRAVERSAL_LINE = (
-    "198.51.100.12 - - [11/Feb/2026:10:00:03 +0000] "
-    '"GET /../../etc/passwd HTTP/1.1" 400 230 "-" '
-    '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"'
-)
+PATH_TRAVERSAL_LINE = ("198.51.100.12 - - [11/Feb/2026:10:00:03 +0000] "
+                       '"GET /../../etc/passwd HTTP/1.1" 400 230 "-" '
+                       '"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"')
 
 
 def _write_lines(log_path: str, *lines: str) -> None:
@@ -127,7 +122,8 @@ async def _poll_threat_count(
     for _ in range(int(timeout / 0.1)):
         await asyncio.sleep(0.1)
         async with session_factory() as session:
-            result = await session.execute(select(func.count()).select_from(ThreatEvent))
+            result = await session.execute(
+                select(func.count()).select_from(ThreatEvent))
             count = result.scalar_one()
             if count >= expected:
                 return count
@@ -163,15 +159,15 @@ async def test_only_medium_plus_stored(integration_env) -> None:
     lines = [
         f"192.168.1.{i + 1} - - [11/Feb/2026:10:00:0{i} +0000] "
         f'"GET /page/{i} HTTP/1.1" 200 1234 "-" '
-        f'"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"'
-        for i in range(5)
+        f'"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"' for i in range(5)
     ]
     _write_lines(env["log_path"], *lines)
 
     await asyncio.sleep(2.0)
 
     async with env["session_factory"]() as session:
-        result = await session.execute(select(func.count()).select_from(ThreatEvent))
+        result = await session.execute(
+            select(func.count()).select_from(ThreatEvent))
         count = result.scalar_one()
 
     assert count == 0

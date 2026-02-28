@@ -15,14 +15,12 @@ class ModelMetadata(TimestampedModel, table=True):
     """
 
     __tablename__ = "model_metadata"
-    __table_args__ = (
-        Index(
-            "idx_model_metadata_active",
-            "model_type",
-            unique=True,
-            postgresql_where=text("is_active = TRUE"),
-        ),
-    )
+    __table_args__ = (Index(
+        "idx_model_metadata_active",
+        "model_type",
+        unique=True,
+        postgresql_where=text("is_active = TRUE"),
+    ), )
 
     model_type: str = Field(max_length=30)
     version: str = Field(max_length=64)

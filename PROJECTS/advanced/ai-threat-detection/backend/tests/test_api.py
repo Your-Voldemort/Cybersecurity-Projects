@@ -1,6 +1,8 @@
 """
 ©AngelaMos | 2026
 test_api.py
+
+Tests the FastAPI REST endpoints for threats, stats, health, readiness, and model management.
 """
 
 import uuid
@@ -19,7 +21,8 @@ async def test_health_returns_200() -> None:
     Health endpoint returns 200 with status and uptime.
     """
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(transport=transport,
+                           base_url="http://test") as client:
         response = await client.get("/health")
 
     assert response.status_code == 200
@@ -36,7 +39,8 @@ async def test_health_returns_pipeline_status() -> None:
     Health response includes pipeline_running boolean.
     """
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(transport=transport,
+                           base_url="http://test") as client:
         response = await client.get("/health")
 
     data = response.json()
@@ -49,7 +53,8 @@ async def test_ready_returns_check_structure() -> None:
     Readiness endpoint returns structured component checks.
     """
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(transport=transport,
+                           base_url="http://test") as client:
         response = await client.get("/ready")
 
     assert response.status_code in (200, 503)
@@ -178,15 +183,16 @@ async def test_stats_empty_window(db_client) -> None:
 @pytest.mark.asyncio
 async def test_model_status() -> None:
     """
-    GET /models/status returns rules-only detection mode.
+    GET /models/status returns rules detection mode
     """
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(transport=transport,
+                           base_url="http://test") as client:
         response = await client.get("/models/status")
 
     assert response.status_code == 200
     data = response.json()
-    assert data["detection_mode"] == "rules-only"
+    assert data["detection_mode"] == "rules"
     assert data["active_models"] == []
 
 
@@ -196,7 +202,8 @@ async def test_retrain_returns_202() -> None:
     POST /models/retrain returns 202 Accepted with a job ID.
     """
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(transport=transport,
+                           base_url="http://test") as client:
         response = await client.post("/models/retrain")
 
     assert response.status_code == 202

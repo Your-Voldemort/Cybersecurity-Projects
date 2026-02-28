@@ -42,15 +42,16 @@ class ThreatEvent(TimestampedModel, table=True):
     user_agent: str
     threat_score: float = Field(sa_column=Column(Float, nullable=False))
     severity: str = Field(max_length=6)
-    component_scores: dict[str, float] = Field(sa_column=Column(JSON, nullable=False))
+    component_scores: dict[str, float] = Field(
+        sa_column=Column(JSON, nullable=False))
     geo_country: str | None = Field(default=None, max_length=2)
     geo_city: str | None = Field(default=None, max_length=255)
     geo_lat: float | None = Field(default=None)
     geo_lon: float | None = Field(default=None)
     feature_vector: list[float] = Field(sa_column=Column(JSON, nullable=False))
-    matched_rules: list[str] | None = Field(
-        default=None, sa_column=Column(JSON, nullable=True)
-    )
+    matched_rules: list[str] | None = Field(default=None,
+                                            sa_column=Column(JSON,
+                                                             nullable=True))
     model_version: str | None = Field(default=None, max_length=64)
     reviewed: bool = Field(default=False)
     review_label: str | None = Field(default=None, max_length=20)

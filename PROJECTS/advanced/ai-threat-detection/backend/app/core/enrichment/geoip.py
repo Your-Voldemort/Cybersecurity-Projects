@@ -40,7 +40,8 @@ class GeoIPService:
             self._reader = geoip2.database.Reader(db_path)
             logger.info("GeoIP database loaded from %s", db_path)
         else:
-            logger.warning("GeoIP database not found at %s — lookups disabled", db_path)
+            logger.warning("GeoIP database not found at %s — lookups disabled",
+                           db_path)
 
     async def lookup(self, ip: str) -> GeoResult | None:
         """
