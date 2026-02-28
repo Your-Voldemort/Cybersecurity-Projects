@@ -6,147 +6,178 @@
 @use '@/styles' as *;
 
 .page {
-  min-height: calc(100vh - 56px);
   padding: $space-6;
-  background-color: $bg-default;
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.header {
-  margin-bottom: $space-6;
-}
-
-.title {
-  font-size: $font-size-2xl;
-  font-weight: $font-weight-semibold;
-  color: $text-default;
-  margin-bottom: $space-2;
-}
-
-.subtitle {
-  font-size: $font-size-sm;
-  color: $text-lighter;
-}
-
-.userCard {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.loading {
+  @include flex-center;
+  height: 300px;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: $space-4;
+
+  @include breakpoint-down('lg') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include breakpoint-down('sm') {
+    grid-template-columns: 1fr;
+  }
+}
+
+.severitySection {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
   padding: $space-5;
   background: $bg-surface-100;
-  border: 1px solid $border-default;
+  border: 1px solid $border-muted;
   border-radius: $radius-lg;
-  margin-bottom: $space-8;
 }
 
-.avatar {
-  width: 56px;
-  height: 56px;
+.severityBar {
+  display: flex;
+  height: 12px;
+  border-radius: $radius-full;
+  overflow: hidden;
+  background: $bg-surface-300;
+}
+
+.severityBarEmpty {
+  height: 12px;
   border-radius: $radius-full;
   background: $bg-surface-300;
-  color: $text-default;
-  font-size: $font-size-xl;
-  font-weight: $font-weight-semibold;
   @include flex-center;
-  flex-shrink: 0;
+  font-size: $font-size-2xs;
+  color: $text-muted;
 }
 
-.userInfo {
-  @include flex-column;
-  gap: $space-1;
-  min-width: 0;
+.severityHigh {
+  background: $severity-high;
+  transition: width $duration-slow $ease-out;
 }
 
-.userName {
-  font-size: $font-size-base;
-  font-weight: $font-weight-medium;
-  color: $text-default;
-  @include truncate;
+.severityMedium {
+  background: $severity-medium;
+  transition: width $duration-slow $ease-out;
 }
 
-.userEmail {
-  font-size: $font-size-sm;
-  color: $text-light;
-  @include truncate;
+.severityLow {
+  background: $severity-low;
+  transition: width $duration-slow $ease-out;
 }
 
-.userRole {
-  display: inline-flex;
-  align-self: flex-start;
-  padding: $space-0-5 $space-2;
-  background: $bg-surface-200;
-  border-radius: $radius-full;
+.legend {
+  display: flex;
+  gap: $space-5;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
   font-size: $font-size-xs;
   color: $text-lighter;
-  text-transform: uppercase;
-  letter-spacing: $tracking-wide;
 }
 
-.section {
-  margin-bottom: $space-8;
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: $radius-full;
 }
 
-.sectionTitle {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-  color: $text-light;
-  text-transform: uppercase;
-  letter-spacing: $tracking-wide;
-  margin-bottom: $space-4;
+.dotHigh {
+  background: $severity-high;
 }
 
-.grid {
+.dotMedium {
+  background: $severity-medium;
+}
+
+.dotLow {
+  background: $severity-low;
+}
+
+.bottomRow {
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: $space-4;
 
-  @include breakpoint-up('md') {
-    grid-template-columns: repeat(3, 1fr);
+  @include breakpoint-down('lg') {
+    grid-template-columns: 1fr;
   }
 }
 
-.card {
-  padding: $space-4;
+.lists {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.rankedList {
+  padding: $space-5;
   background: $bg-surface-100;
-  border: 1px solid $border-default;
+  border: 1px solid $border-muted;
   border-radius: $radius-lg;
 }
 
-.hookName {
-  display: inline-block;
+.rankedTitle {
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   color: $text-default;
-  background: $bg-surface-200;
-  padding: $space-1 $space-2;
-  border-radius: $radius-sm;
-  margin-bottom: $space-2;
+  margin: 0 0 $space-3;
 }
 
-.description {
-  font-size: $font-size-sm;
+.rankedItems {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.rankedItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-1-5 0;
+  font-size: $font-size-xs;
+}
+
+.rankedLabel {
   color: $text-light;
-  margin-bottom: $space-2;
-  line-height: $line-height-relaxed;
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.file {
+.rankedCount {
+  color: $text-lighter;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  margin-left: $space-3;
+}
+
+.emptyText {
   font-size: $font-size-xs;
   color: $text-muted;
-  font-family: $font-mono;
 }
 
-.list {
-  @include flex-column;
-  gap: $space-2;
-  padding-left: $space-5;
-  list-style: disc;
-
-  li {
-    font-size: $font-size-sm;
-    color: $text-light;
-  }
+.wsError {
+  padding: $space-3 $space-4;
+  background: $severity-high-bg;
+  border: 1px solid $severity-high;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  color: $severity-high;
 }
