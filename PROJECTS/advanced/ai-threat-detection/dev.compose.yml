@@ -71,6 +71,24 @@ services:
       retries: 3
       start_period: 15s
 
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/docker/vite.dev
+    container_name: vigil-frontend-dev
+    environment:
+      VITE_API_TARGET: http://backend:8000
+    ports:
+      - "${FRONTEND_HOST_PORT:-46969}:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules_dev:/app/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - vigil_dev
+
 networks:
   vigil_dev:
     driver: bridge
@@ -79,3 +97,4 @@ volumes:
   postgres_dev:
   redis_dev:
   nginx_logs_dev:
+  frontend_node_modules_dev:

@@ -11,6 +11,10 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, path.resolve(__dirname, '..'), '')
   const isDev = mode === 'development'
+  const apiTarget =
+    process.env.VITE_API_TARGET ||
+    env.VITE_API_TARGET ||
+    'http://localhost:8000'
 
   return {
     plugins: [react(), tsconfigPaths()],
@@ -32,9 +36,14 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       proxy: {
         '/api': {
-          target: env.VITE_API_TARGET || 'http://localhost:8000',
+          target: apiTarget,
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/api/, ''),
+        },
+        '/ws': {
+          target: apiTarget,
+          ws: true,
+          changeOrigin: true,
         },
       },
     },
