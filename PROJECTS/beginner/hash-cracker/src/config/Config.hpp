@@ -58,14 +58,17 @@ constexpr std::string_view BAR_RIGHT = "\u258C";
 
 }
 
-namespace icon {
+namespace symbol {
 
-constexpr std::string_view BOLT = "\u26A1";
+constexpr std::string_view ARROW = "\u2192";
+constexpr std::string_view ARROW_RIGHT = "\u25B8";
+constexpr std::string_view DIAMOND = "\u25C6";
+constexpr std::string_view CHECK = "\u2713";
+constexpr std::string_view CROSS = "\u2717";
 constexpr std::string_view TIMER = "\u23F1";
-constexpr std::string_view HOURGLASS = "\u23F3";
-constexpr std::string_view CHART = "\U0001F4CA";
-constexpr std::string_view CHECK = "\u2714";
-constexpr std::string_view CROSS = "\u2716";
+constexpr std::string_view TRIANGLE_UP = "\u25B2";
+constexpr std::string_view STAR = "\u2726";
+constexpr std::string_view DIVIDER_CHAR = "\u2501";
 
 }
 

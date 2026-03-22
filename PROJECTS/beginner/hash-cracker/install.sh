@@ -8,11 +8,14 @@ GREEN='\033[32m'
 CYAN='\033[36m'
 RED='\033[31m'
 BOLD='\033[1m'
+DIM='\033[2m'
 RESET='\033[0m'
 
 info() { echo -e "${CYAN}[*]${RESET} $1"; }
 success() { echo -e "${GREEN}[✔]${RESET} $1"; }
 fail() { echo -e "${RED}[✖]${RESET} $1"; exit 1; }
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 install_deps() {
     if command -v apt-get &>/dev/null; then
@@ -34,11 +37,18 @@ install_deps() {
 }
 
 build_project() {
+    cd "${PROJECT_DIR}"
     info "Configuring release build..."
     cmake --preset release
 
     info "Building..."
     cmake --build build/release
+}
+
+install_binary() {
+    info "Installing hashcracker to ~/.local/bin..."
+    mkdir -p ~/.local/bin
+    ln -sf "${PROJECT_DIR}/build/release/hashcracker" ~/.local/bin/hashcracker
 }
 
 info "Installing dependencies..."
@@ -47,14 +57,15 @@ install_deps
 info "Building hashcracker..."
 build_project
 
+install_binary
+
 echo ""
 success "hashcracker built successfully!"
 echo ""
 echo -e "${BOLD}Usage:${RESET}"
-echo "  ./build/release/hashcracker --hash <hash> --wordlist <path>"
-echo "  ./build/release/hashcracker --hash <hash> --bruteforce --charset lower,digits"
-echo "  ./build/release/hashcracker --hash <hash> --wordlist <path> --rules"
+echo "  hashcracker --hash <hash> --wordlist wordlists/10k-most-common.txt"
+echo "  hashcracker --hash <hash> --bruteforce --charset lower,digits"
+echo "  hashcracker --hash <hash> --wordlist wordlists/10k-most-common.txt --rules"
 echo ""
-echo -e "${BOLD}Or use just:${RESET}"
-echo "  just run -- --hash <hash> --wordlist <path>"
+echo -e "  ${DIM}(Binary symlinked to ~/.local/bin/hashcracker)${RESET}"
 echo ""

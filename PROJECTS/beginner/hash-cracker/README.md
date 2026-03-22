@@ -29,7 +29,9 @@
 
 ```bash
 ./install.sh
-hashcracker --hash <hash> --wordlist /path/to/rockyou.txt
+hashcracker --hash 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 \
+  --wordlist wordlists/10k-most-common.txt
+# ✔ CRACKED: password
 ```
 
 > [!TIP]
@@ -37,15 +39,21 @@ hashcracker --hash <hash> --wordlist /path/to/rockyou.txt
 >
 > Install: `curl -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin`
 
-## Commands
+## Demo Hashes
 
-| Command | Description |
-|---------|-------------|
-| `hashcracker --hash <h> --wordlist <path>` | Dictionary attack against a hash |
-| `hashcracker --hash <h> --bruteforce --charset lower,digits` | Brute-force with character set |
-| `hashcracker --hash <h> --wordlist <path> --rules` | Dictionary + mutation rules |
-| `hashcracker --hash <h> --wordlist <path> --salt <s>` | Crack salted hash |
-| `hashcracker --help` | Show all options |
+Try these — all crack instantly against the included wordlist:
+
+| Hash | Type | Plaintext |
+|------|------|-----------|
+| `5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8` | SHA256 | password |
+| `8621ffdbc5698829397d97767ac13db3` | MD5 | dragon |
+| `ed9d3d832af899035363a69fd53cd3be8f71501c` | SHA1 | shadow |
+
+```bash
+hashcracker --hash 8621ffdbc5698829397d97767ac13db3 --wordlist wordlists/10k-most-common.txt
+hashcracker --hash ed9d3d832af899035363a69fd53cd3be8f71501c --wordlist wordlists/10k-most-common.txt --rules
+hashcracker --hash 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8 --bruteforce --charset lower --max-length 8
+```
 
 ## Learn
 

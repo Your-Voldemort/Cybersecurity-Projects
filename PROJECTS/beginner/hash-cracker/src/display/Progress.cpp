@@ -137,13 +137,13 @@ void Progress::update() {
         config::color::YELLOW, render_bar(fraction, bar_width),
         fraction * 100.0, config::color::RESET);
     std::println("  {} {} {} {}  {} {} {} ~{}{}",
-        config::icon::BOLT, config::color::CYAN,
+        config::symbol::DIAMOND, config::color::CYAN,
         format_speed(speed), config::color::RESET,
-        config::icon::TIMER, config::color::CYAN,
+        config::symbol::TIMER, config::color::CYAN,
         format_time(elapsed), format_time(eta),
         config::color::RESET);
     std::println("  {} {} {} / {} candidates{}",
-        config::icon::CHART, config::color::CYAN,
+        config::symbol::ARROW_RIGHT, config::color::CYAN,
         format_count(tested_val), format_count(total_),
         config::color::RESET);
 }
@@ -157,7 +157,7 @@ void Progress::print_cracked(const CrackResult& result) const {
     std::print("\033[3A\033[J");
 
     std::println("  {}{} CRACKED {}{}{}",
-        config::color::GREEN, config::icon::CHECK,
+        config::color::GREEN, config::symbol::CHECK,
         std::string(30, '-'), config::color::RESET, "");
     std::println("  {}Password:  {}{}{}",
         config::color::BOLD, config::color::GREEN,
@@ -184,7 +184,7 @@ void Progress::print_exhausted(std::string_view hash,
     std::print("\033[3A\033[J");
 
     std::println("  {}{} EXHAUSTED {}{}{}",
-        config::color::RED, config::icon::CROSS,
+        config::color::RED, config::symbol::CROSS,
         std::string(30, '-'), config::color::RESET, "");
     std::println("  Hash:      {}", hash);
     std::println("  Algorithm: {}", algorithm);

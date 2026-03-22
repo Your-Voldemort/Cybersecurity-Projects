@@ -1,7 +1,6 @@
 # ©AngelaMos | 2026
 # .gitignore
 
-docs/
 build/
 *.o
 *.a
