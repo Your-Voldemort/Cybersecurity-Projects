@@ -19,6 +19,14 @@ public:
     std::size_t progress() const;
 
 private:
-    std::size_t total_ = 0;
-    std::size_t current_ = 0;
+    std::string charset_;
+    std::size_t max_length_;
+    std::size_t total_keyspace_;
+    std::size_t start_index_;
+    std::size_t end_index_;
+    std::size_t current_index_;
+
+    std::string index_to_candidate(std::size_t index) const;
+    static std::size_t compute_keyspace(std::size_t charset_size,
+                                        std::size_t max_length);
 };

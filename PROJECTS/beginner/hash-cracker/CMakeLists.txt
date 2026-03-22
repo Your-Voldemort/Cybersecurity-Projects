@@ -75,4 +75,6 @@ target_link_libraries(hashcracker_tests
     PRIVATE hashcracker_lib GTest::gtest_main
 )
 include(GoogleTest)
-gtest_discover_tests(hashcracker_tests)
+gtest_discover_tests(hashcracker_tests
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)

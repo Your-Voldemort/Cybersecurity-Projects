@@ -7,6 +7,8 @@
 #include <expected>
 #include <string>
 #include <string_view>
+#include <vector>
+#include "src/attack/DictionaryAttack.hpp"
 #include "src/core/Concepts.hpp"
 
 class RuleAttack {
@@ -20,5 +22,13 @@ public:
     std::size_t progress() const;
 
 private:
-    RuleAttack() = default;
+    RuleAttack(DictionaryAttack dict, bool chain_rules);
+
+    DictionaryAttack dict_;
+    bool chain_rules_;
+    std::vector<std::string> mutations_;
+    std::size_t mutation_index_ = 0;
+    std::size_t candidates_yielded_ = 0;
+
+    bool load_next_word();
 };
