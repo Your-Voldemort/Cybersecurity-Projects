@@ -4,5 +4,6 @@
 *.coverage
 .env
 .angelusvigil/
+.worktrees/
 
 PROJECTS/beginner/hash-cracker/docs/
